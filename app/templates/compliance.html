@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8' />
+    <title></title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <!-- map box -->
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.11.0/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.11.0/mapbox-gl.css' rel='stylesheet' />
+
+    <!-- mapbox geocoder -->
+    <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.5.1/mapbox-gl-geocoder.min.js"></script>
+    <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.5.1/mapbox-gl-geocoder.css" type="text/css" />
+    <!-- Promise polyfill script required to use Mapbox GL Geocoder in IE 11 -->
+    <script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.auto.min.js"></script>
+    <!-- turf.js -->
+    <script src="{{ url_for('static', filename='js/turf.min.js') }}"></script>
+    <!-- bootstrap -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.css" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js"></script>
+    
+    <!-- custom CSS -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <div class="container-fluid fixed-top bg-dark shadow">
+    <div class="row collapse-me show no-gutters d-flex h-100 position-relative">
+        <div  class="col-3 px-0 w-sidebar navbar-collapse collapse-me d-none d-md-flex">
+            <!-- spacer col -->
+            <i class="text-white fa fa-globe fa-lg" aria-hidden="true"></i>
+        </div>
+        <div class="col px-3 px-md-0 py-3">
+            <div class="d-flex">
+                <!-- toggler -->
+                <a data-toggle="collapse" href="#" data-target=".collapse-me" role="button" class="">
+                    <i class="text-white fa fa-bars fa-lg"></i>
+                </a>
+                <div class="ml-auto text-white"><h4 id="featureCount">Loading Data
+                  <span><i class="fa fa-circle-o-notch fa-spin fa-lg"></i></span></h4>
+                </div>
+                <div id="geocoder" class="ml-auto"></div>
+                <div class="ml-auto">
+                  <a href="https://medium.com/kray-freestone" class="text-white"><i class="fa fa-info-circle fa-lg"></i></a>
+                  <a href="https://github.com/freestok/heroku-site" class="text-white"><i class="fa fa-github fa-lg"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container-fluid px-0 h-100">
+    <div class="row min-vh-100 collapse-me show no-gutters d-flex h-100 position-relative">
+        <div class="col-3 p-0 h-100 text-white w-sidebar navbar-collapse collapse-me d-none d-md-flex sidebar">
+            <!-- fixed sidebar -->
+            <div class="navbar-dark bg-dark position-fixed h-100 w-sidebar">
+                <h6 class="px-3 pt-3"></h6>
+                <ul class="nav flex-column flex-nowrap text-truncate">
+                    <li class="nav-item pt-3 pl-2">
+                      <h3>Filter case by...</h3>
+                    </li>
+                    <li class="nav-item pt-3 pl-2">
+                      <div class="btn-group-vertical btn-group-toggle flex-wrap" data-toggle="buttons" >
+                        <label class="btn btn-secondary btn active" >
+                          <input type="radio" name="options" id="openCases" autocomplete="off" checked> Open Cases
+                        </label>
+                        <label class="btn btn-secondary btn">
+                          <input type="radio" name="options" id="closedCases" autocomplete="off"> Closed Cases
+                        </label>
+                        <label class="btn btn-secondary btn">
+                          <input type="radio" name="options" id="bothCases" autocomplete="off"> Open & Closed
+                        </label>
+                      </div>
+                    </li>
+                  <li class="nav-item pt-3 pl-2">
+                    <h5>Case Type</h5>
+                    <select class="selectpicker side" data-container="body" data-width="92%" id="caseType">
+                      <option  class="dropdown-item">None</option>
+                      {% for i in case_types %}
+                      <option class="dropdown-item">{{ i }}</option>
+                      {% endfor %}
+                    </select>
+                  </li>
+                  <li class="nav-item pt-3 pl-2">
+                    <h5>Case Status</h5>
+                    <select class="selectpicker" data-container="body" data-width="92%" id="caseStatus">
+                      <option class="dropdown-item">None</option>
+                    </select>
+                  </li>
+                  <li class="nav-item pt-5 pl-2">
+                    <h5>Create Report:</h5>
+                    <p><em>Your filters apply*</em></p>
+                    <div class="btn-group-horizontal">
+                      <input class="btn btn-secondary" id="viewDOCX" type="button" value="DOCX">
+                    </div>
+                    <p class="pt-2"><em>*including current view</em></p>
+                    <span id="creating-report">Creating Report... <i class="fa fa-circle-o-notch fa-spin fa-lg"></i></span>
+                    <p class="pt-2" id="download-link">Report Ready: <a class="text-info" id="inner-download" href="#">Download</a></p>
+                  </li>
+                </ul>
+            </div>
+        </div>
+        <div>
+          
+          <div id='map' class='map pad2'></div>
+          <div id="popupCard" class="pl-3 pt-5" >
+            <div class="card bg-light mb-3" data-width="fit">
+              <div class="card-header">
+                <h5 id="showButton" class="mb-0">
+                  <div class="row" data-width="fit">
+                    <button class="btn" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne" id="pHeader">
+                      <span id="headingOne">Click on a property for case information</span>
+                      <i class="fa fa-chevron-down fa-lg pl-2" aria-hidden="true"></i>
+                    </button>
+                  </div>
+                </h5>
+              </div>
+              <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
+                <div class="card-body">
+                  <h4 id="pCaseCount"></h4>
+                  <h5 class="card-title">
+                    <select class="selectpicker" data-width="fit" id="pOptions">
+                    </select>
+                  </h5>
+                  <p class="card-text" id="pCaseNum"></p>
+                  <p class="card-text" id="pStatus"></p>
+                  <p class="card-text" id="pDescription"></p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="float-right">
+            <div id="geocoder" class="float-right"></div>
+          </div>
+        </div>
+    </div>
+  </div>
+  <script src="{{ url_for('static', filename='js/violations.js') }}"></script>
+</body>
+</html>
