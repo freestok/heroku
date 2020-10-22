@@ -23,8 +23,12 @@ from app.utilities import delete_data
 @app.route('/compliance',methods=['GET'])
 def compliance():
     try:
-        response = requests.get('https://grviolations.s3.us-east-2.amazonaws.com/choices.json')
-        choices = json.loads(response.text)
+        pth = os.path.join('app','static','choices.json')
+        with open(pth) as f:
+            choices = json.load(f)
+
+        # response = requests.get('https://grviolations.s3.us-east-2.amazonaws.com/choices.json')
+        # choices = json.loads(response.text)
         session['choices'] = choices
         case_types = list(choices.keys())
         case_types.sort()

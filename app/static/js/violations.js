@@ -89,8 +89,10 @@ function fetchReport() {
 // -----------------------------------------------------------------------------------------------
 // ------------------------- MAPBOX VARIABLES AND LOGIC ------------------------------------------
 // -----------------------------------------------------------------------------------------------
-const parcelFile = 'https://grviolations.s3.us-east-2.amazonaws.com/parcels.geojson'
-const cases      = 'https://grviolations.s3.us-east-2.amazonaws.com/cases.geojson'
+// const parcelFile = 'https://grviolations.s3.us-east-2.amazonaws.com/parcels.geojson'
+// const cases      = 'https://grviolations.s3.us-east-2.amazonaws.com/cases.geojson'
+const parcelFile = "static/parcels.geojson"
+const cases      = "static/cases.geojson"
 
 mapboxgl.accessToken = 'pk.eyJ1IjoiZnJlZXN0b2siLCJhIjoiY2p5bGd1dWg5MDhiZjNvdDgyYmFta2dweCJ9.5pV_bAq161_KlSJgGw0hYQ';
 const map = new mapboxgl.Map({
