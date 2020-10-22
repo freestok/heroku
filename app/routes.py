@@ -27,6 +27,8 @@ def compliance():
         with open(pth) as f:
             choices = json.load(f)
 
+        print('loading')
+
         # response = requests.get('https://grviolations.s3.us-east-2.amazonaws.com/choices.json')
         # choices = json.loads(response.text)
         session['choices'] = choices
