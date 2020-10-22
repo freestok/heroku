@@ -93,6 +93,7 @@ function fetchReport() {
 // const cases      = 'https://grviolations.s3.us-east-2.amazonaws.com/cases.geojson'
 const parcelFile = "static/parcels.geojson"
 const cases      = "static/cases.geojson"
+alert("This map is no longer being maintained. The last update was on 10/22/2020");
 
 mapboxgl.accessToken = 'pk.eyJ1IjoiZnJlZXN0b2siLCJhIjoiY2p5bGd1dWg5MDhiZjNvdDgyYmFta2dweCJ9.5pV_bAq161_KlSJgGw0hYQ';
 const map = new mapboxgl.Map({
@@ -164,6 +165,8 @@ map.on('load', function() {
 
   // add pop-up logic
   map.on('click', 'parcelLayer', function(e) {
+
+
     let features = map.queryRenderedFeatures({layers: ['cases']});
     let popupArray = []
     popupObj.length = 0 // empty array of objects for new parcel
