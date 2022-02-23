@@ -6,6 +6,7 @@ from flask import send_from_directory
 @app.route("/")
 def root():
     # return 'hi'
+    return app.send_static_file('index.html')
     return send_from_directory(app.static_folder, 'index.html')
 # ----------------------------- back-end routes --------------------------------
 @app.route('/api/time')
