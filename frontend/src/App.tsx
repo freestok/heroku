@@ -10,7 +10,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home/>} />
-        <Route path="/geog777-proj1" element={<NitrateCancer/>} />
+        <Route path="/nitrate-cancer" element={<NitrateCancer/>} />
       </Routes>
     </BrowserRouter>
   );
