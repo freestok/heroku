@@ -13,7 +13,15 @@ import {
   useDisclosure,
   BoxProps,
   FlexProps,
+  FormControl,
+  FormLabel,
+  Input,
+  FormHelperText,
+  FormErrorMessage,
+  Button
 } from '@chakra-ui/react';
+
+import { Textarea } from '@chakra-ui/react';
 import {
   FiHome,
   FiTrendingUp,
@@ -21,6 +29,7 @@ import {
   FiStar,
   FiSettings,
   FiMenu,
+  FiMap
 } from 'react-icons/fi';
 import { IconType } from 'react-icons';
 import { ReactText } from 'react';
@@ -79,7 +88,7 @@ const NitrateCancer: FC<any> = ({ children }: { children: ReactNode }) => {
       <MobileNav display={{ base: 'flex', md: 'none' }} onOpen={onOpen} />
       <Box ml={{ base: 0, md: 60 }} p="4">
         {children}
-        <D3Map data={files}/>
+        <D3Map data={files} />
       </Box>
     </Box>
   );
@@ -99,19 +108,39 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
       pos="fixed"
       h="full"
       {...rest}>
-      <Flex h="20" alignItems="center" mx="8" justifyContent="space-between">
+      <Flex h="20" alignItems="center" marginBottom={3} mx="8" justifyContent="space-between">
         <Text fontSize="2xl" fontFamily="monospace" fontWeight="bold">
-          Logo
+          Correlation Finder
         </Text>
         <CloseButton display={{ base: 'flex', md: 'none' }} onClick={onClose} />
       </Flex>
-      {LinkItems.map((link) => (
-        <NavItem key={link.name} icon={link.icon}>
-          {link.name}
-        </NavItem>
-      ))}
+      {/* <TextItem key="test" icon={FiSettings}>
+        test
+      </TextItem> */}
+      <FormControl marginLeft={3}>
+        <FormLabel >Enter your K-value:</FormLabel>
+        <FormHelperText><em>Make it {'>='} to 1</em></FormHelperText>
+        <Input type={'number'} min={1} defaultValue={1} width='5em'/>
+
+        <FormLabel >Resolution</FormLabel>
+        <FormHelperText><em>B/w 100-1000</em></FormHelperText>
+        <Input type={'number'} min={100} max={1000} defaultValue={250} width='5em' />
+      </FormControl>
+      <Button onClick={() => makeRequest()} type="submit" ml={3} mt={3} colorScheme="blue">Submit</Button>
+      {/* {LinkItems.map((link) => ( */}
+        {/* <NavItem key={link.name} icon={link.icon}> */}
+          {/* {link.name} */}
+        {/* </NavItem> */}
+      {/* ))} */}
     </Box>
   );
+};
+
+const makeRequest = () => {
+  console.log('hi');
+  // fetch('api/time').then(res => res.json()).then(data => {
+  //   setCurrentTime(data.time);
+  // });
 };
 
 interface NavItemProps extends FlexProps {
@@ -121,6 +150,39 @@ interface NavItemProps extends FlexProps {
 const NavItem = ({ icon, children, ...rest }: NavItemProps) => {
   return (
     <Link href="#" style={{ textDecoration: 'none' }} _focus={{ boxShadow: 'none' }}>
+      <Flex
+        align="center"
+        p="4"
+        mx="4"
+        borderRadius="lg"
+        role="group"
+        cursor="pointer"
+        _hover={{
+          bg: 'cyan.400',
+          color: 'white',
+        }}
+        {...rest}>
+        {icon && (
+          <Icon
+            mr="4"
+            fontSize="16"
+            _groupHover={{
+              color: 'white',
+            }}
+            as={icon}
+          />
+        )}
+        {children}
+      </Flex>
+    </Link>
+  );
+};
+const TextItem = ({ icon, children, ...rest }: NavItemProps) => {
+  return (
+    <Link href="#" style={{ textDecoration: 'none' }} _focus={{ boxShadow: 'none' }}>
+      <Textarea>
+        test
+      </Textarea>
       <Flex
         align="center"
         p="4"
