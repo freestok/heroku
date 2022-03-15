@@ -1,5 +1,5 @@
 # heroku-site
-GitHub repository for my Heroku site.
+GitHub repository for my Heroku site
 
 # Instructions on Running
 This uses npm version `16.13.2`
