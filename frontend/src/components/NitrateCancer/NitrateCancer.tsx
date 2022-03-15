@@ -188,8 +188,9 @@ const SidebarContent = ({ onClose, d3Data, files, setFiles, complete, setComplet
 
     const json = await res.json();
     console.log('json', json);
-    console.log('rerender??');
 
+    setFiles({ nitrateFile: nitrateFile, tractsFile: tractsFile, analysisResults: json })
+    json['symbol'] = 'canrate';
     setFiles({ nitrateFile: nitrateFile, tractsFile: tractsFile, analysisResults: json })
     setLoading(false);
     setComplete(true);
@@ -271,7 +272,7 @@ const SidebarContent = ({ onClose, d3Data, files, setFiles, complete, setComplet
             <RadioGroup defaultValue="canrate" onChange={event => radioButtonChange(event, files, setFiles)}>
               <Radio value="canrate">Cancer Rate</Radio>
               <Radio value="mean">Average Nitrate Level</Radio>
-              <Radio value="fitVal">Predicted Cancer Rate</Radio>
+              {/* <Radio value="fitVal">Predicted Cancer Rate</Radio> */}
               <Radio value="residuals">Residuals</Radio>
               <Radio value="stdResid">Standardized Residuals</Radio>
             </RadioGroup>

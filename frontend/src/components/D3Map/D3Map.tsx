@@ -36,6 +36,9 @@ const diverging = chroma
 // .classes([-2.5,-1.5,-0.5,0.5,1.5,2.5])
 // .colors(7);
 
+// goes from 0-1
+const continuousChroma = chroma.scale('purples');
+
 console.log('diverging', diverging);
 
 ////////////////////////////////////////////////////// 
@@ -67,17 +70,41 @@ const renderInitialMap = (data: any, path: any, svgRef: any) => {
   svg.call(zoom);
 };
 
-const getColor = (val: any) => {
+const getColor = (val: any, symbol: string): string => {
   // diverging
   // console.log(val);
-  return val < -2.5 ? diverging[0] :
-    val <= -1.5 ? diverging[1] :
-      val <= -0.5 ? diverging[2] :
-        val <= 0.5 ? diverging[3] :
-          val <= 1.5 ? diverging[5] :
-            val <= 2.5 ? diverging[6] :
-              val > 2.5 ? diverging[7] :
-                'grey';
+  let valColor = 'grey';
+  if (symbol === 'canrate') {
+    valColor = continuousChroma(val) as unknown as string;
+    // console.log('valColor', valColor);
+  } else if (symbol === 'stdResid') {
+    valColor = val < -2.5 ? diverging[0] :
+      val <= -1.5 ? diverging[1] :
+        val <= -0.5 ? diverging[2] :
+          val <= 0.5 ? diverging[3] :
+            val <= 1.5 ? diverging[5] :
+              val <= 2.5 ? diverging[6] :
+                val > 2.5 ? diverging[7] :
+                  'grey';
+
+  } else if (symbol === 'fitVal') {
+
+  } else if (symbol === 'mean') {
+    // -1 to 16
+    let min = -1;
+    let max = 16
+    let range = max - min;
+    let interpolatedVal = ((val - min)) / range
+    // console.log('interpolatedVal');
+    valColor = continuousChroma(interpolatedVal) as unknown as string;
+
+    // let valColor2 = continuousChroma(interpolatedVal).name;
+    // console.log('valColor2', valColor2);
+  } else if (symbol === 'residuals') {
+    valColor = continuousChroma(val) as unknown as string;
+  }
+
+  return valColor;
 }
 
 const renderResult = (data: any, path: any, svgRef: React.MutableRefObject<any>, setPopup: React.Dispatch<React.SetStateAction<PopupInfoProps>>) => {
@@ -97,7 +124,7 @@ const renderResult = (data: any, path: any, svgRef: React.MutableRefObject<any>,
         // console.log('d', d);
         const otherInfo = tempObj[d.properties.GEOID10];
         if (otherInfo) {
-          return getColor(tempObj[d.properties.GEOID10].properties[fieldSymbol]);
+          return getColor(tempObj[d.properties.GEOID10].properties[fieldSymbol], fieldSymbol);
         }
         // // console.log('otherInfo', otherInfo);
         // console.log('fieldSymbol', fieldSymbol);
@@ -139,14 +166,22 @@ const PopupInfo: FC<PopupInfoProps> = (props: PopupInfoProps) => {
   const svgRef = useRef<any>(null);
   const svg = d3.select(svgRef.current);
   const [legendTitle, setLegendTitle] = useState('')
-  svgLegend(svg, 'canrate')
-
+  // const [symbol, setSymbol] = useState(false)
+  // if (!symbol) {
+  //   svgLegend(svg, 'canrate')
+  //   setLegendTitle(aliasMapper['canrate'])
+  // }
+  // console.log('AHHHHHHHHHHHHHHHHHHHHHHHHHH')
+  svgLegend(svg, props.symbol ? props.symbol : 'canrate')
   useEffect(() => {
-    console.log('POPUP USE EFFECT')
     const symbolName = props.symbol ? props.symbol : 'canrate'
     svgLegend(svg, symbolName);
     setLegendTitle(aliasMapper[symbolName])
   }, [props.symbol])
+
+  useEffect(() => {
+    console.log('INIT!')
+  }, [])
 
   return (
     <Box p={2} ml={3} mr={3} borderWidth={1} w='full' h='full' borderRadius={8} bg="purple.100" boxShadow="lg">
@@ -175,7 +210,7 @@ const PopupInfo: FC<PopupInfoProps> = (props: PopupInfoProps) => {
               <svg ref={svgRef}
                 style={{
                   height: "100%",
-                  width: "22em",
+                  width: legendTitle !== 'Standardized Residual' ? '15em': '22em',
                   marginRight: "0em",
                   marginLeft: "0em",
                   marginTop: "0em",
@@ -260,6 +295,7 @@ function svgLegend(svg: d3.Selection<any, unknown, null, undefined>, type: strin
   let legend: any;
 
   if (type === 'stdResid') {
+    console.log('STD')
     const scale = d3.scaleThreshold<number, string>()
       .domain([-2.5, -1.5, -0.5, 0.5, 1.5, 2.5])
       .range(diverging as unknown as any);
@@ -275,26 +311,40 @@ function svgLegend(svg: d3.Selection<any, unknown, null, undefined>, type: strin
 
     const scale = d3.scaleLinear<any>()
       .domain([0, 10])
-      .range(["rgb(46, 73, 123)", "rgb(71, 187, 94)"]);
+      .range([continuousChroma.colors(2)[0], continuousChroma.colors(2)[1]]);
     //  const scale = d3.scaleThreshold<number, string>()
     // .domain([-2.5, -1.5, -0.5, 0.5, 1.5, 2.5])
     // .range(diverging as unknown as any);
-    console.log('legend...')
     legend = d3Legend.legendColor()
       .shapeWidth(35)
-      .labels(['<-2.5', '-2.5', '-1.5', '-0.5', '0.5', '1.5', '2.5', '>2.5'])
+      .labels(['low', '', '', '', 'high'])
       .orient('horizontal')
       .scale(scale);
-    console.log('legend1', legend);
   } else if (type === 'residuals') {
-
+    const scale = d3.scaleLinear<any>()
+      .domain([0, 10])
+      .range([continuousChroma.colors(2)[0], continuousChroma.colors(2)[1]]);
+    //  const scale = d3.scaleThreshold<number, string>()
+    // .domain([-2.5, -1.5, -0.5, 0.5, 1.5, 2.5])
+    // .range(diverging as unknown as any);
+    legend = d3Legend.legendColor()
+      .shapeWidth(35)
+      .labels(['low', '', '', '', 'high'])
+      .orient('horizontal')
+      .scale(scale);
   } else if (type === 'mean') {
+    const scale = d3.scaleLinear<any>()
+      .domain([0, 10])
+      .range([continuousChroma.colors(2)[0], continuousChroma.colors(2)[1]]);
 
+    legend = d3Legend.legendColor()
+      .shapeWidth(35)
+      .labels(['low', '', '', '', 'high'])
+      .orient('horizontal')
+      .scale(scale);
   } else if (type === 'fitVal') {
 
   }
-  console.log('svg.select....')
-  console.log('legend', legend);
   svg.select(".svgLegend")
     .call(legend);
 
