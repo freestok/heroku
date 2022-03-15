@@ -74,8 +74,6 @@ interface D3Feature {
 }
 
 const radioButtonChange = (e: string, files: any, setFiles: any) => {
-  console.log('e', e)
-  console.log('files', files);
 
   const json = files.analysisResults;
   json['symbol'] = e;
@@ -152,7 +150,6 @@ interface SidebarProps extends BoxProps {
 
 
 const SidebarContent = ({ onClose, d3Data, files, setFiles, complete, setComplete, ...rest }: SidebarProps) => {
-  console.log('...rest', d3Data);
   const [kVal, setKVal] = useState(kValDefault);
   const [resolution, setResolution] = useState(resolutionDefault);
   const [nnear, setNnear] = useState(8);
@@ -163,8 +160,6 @@ const SidebarContent = ({ onClose, d3Data, files, setFiles, complete, setComplet
     // console.log(d3Data);
     setLoading(true);
     event.preventDefault();
-    console.log('event', event);
-    console.log(kVal, resolution);
 
     const points = d3Data.nitrate.features;
     const tracts = d3Data.tracts.features;
@@ -175,7 +170,6 @@ const SidebarContent = ({ onClose, d3Data, files, setFiles, complete, setComplet
       points: points,
       tracts: tracts
     }
-    console.log('d3Data', d3Data.tracts)
     const requestOptions = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -187,7 +181,6 @@ const SidebarContent = ({ onClose, d3Data, files, setFiles, complete, setComplet
     const res = await fetch('nitrate-cancer/run', requestOptions);
 
     const json = await res.json();
-    console.log('json', json);
 
     setFiles({ nitrateFile: nitrateFile, tractsFile: tractsFile, analysisResults: json })
     json['symbol'] = 'canrate';
@@ -279,7 +272,7 @@ const SidebarContent = ({ onClose, d3Data, files, setFiles, complete, setComplet
           </Box>
           <HStack p={2} mt={4} ml={3} mr={3}>
             <Button bg={'gray.200'} _hover={{ bg: 'gray.300' }}>
-              <Link href='/nitrate-cancer/report' isExternal>
+              <Link href='http://localhost:5000/nitrate-cancer/report' isExternal>
                 Open Report
               </Link>
 

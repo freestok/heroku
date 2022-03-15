@@ -39,14 +39,11 @@ const diverging = chroma
 // goes from 0-1
 const continuousChroma = chroma.scale('purples');
 
-console.log('diverging', diverging);
 
 ////////////////////////////////////////////////////// 
 // RENDER THE CHART USING D3
 //////////////////////////////////////////////////////   
 const renderInitialMap = (data: any, path: any, svgRef: any) => {
-  console.log('data', data);
-  // console.log('path', path);
   const svg = d3.select(svgRef.current);
   svg.selectAll('*').remove();
 
@@ -179,9 +176,6 @@ const PopupInfo: FC<PopupInfoProps> = (props: PopupInfoProps) => {
     setLegendTitle(aliasMapper[symbolName])
   }, [props.symbol])
 
-  useEffect(() => {
-    console.log('INIT!')
-  }, [])
 
   return (
     <Box p={2} ml={3} mr={3} borderWidth={1} w='full' h='full' borderRadius={8} bg="purple.100" boxShadow="lg">
@@ -257,7 +251,6 @@ const D3Map: FC<D3MapProps> = (props: D3MapProps) => {
     });
 
     if (props.data.analysisResults) {
-      console.log('RENDER RESULT')
       setSymbol(props.data.analysisResults.symbol);
       renderResult(props.data.analysisResults, path, svgRef, setPopup);
     } else {
@@ -295,7 +288,6 @@ function svgLegend(svg: d3.Selection<any, unknown, null, undefined>, type: strin
   let legend: any;
 
   if (type === 'stdResid') {
-    console.log('STD')
     const scale = d3.scaleThreshold<number, string>()
       .domain([-2.5, -1.5, -0.5, 0.5, 1.5, 2.5])
       .range(diverging as unknown as any);
@@ -307,8 +299,6 @@ function svgLegend(svg: d3.Selection<any, unknown, null, undefined>, type: strin
       .scale(scale);
 
   } else if (type === 'canrate') {
-    console.log('CANRATE')
-
     const scale = d3.scaleLinear<any>()
       .domain([0, 10])
       .range([continuousChroma.colors(2)[0], continuousChroma.colors(2)[1]]);
@@ -360,7 +350,6 @@ function useWindowSize() {
   useEffect(() => {
     // Handler to call on window resize
     function handleResize() {
-      console.log(window.innerWidth);
       // Set window width/height to state
       setWindowSize({
         width: window.innerWidth,
