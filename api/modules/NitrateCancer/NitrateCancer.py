@@ -23,7 +23,9 @@ blueprint = Blueprint('NitrateCancer', __name__,
     static_folder='./../../../build')
 
 @blueprint.route('/')
-def geog777_proj1(): return blueprint.send_static_file('index.html')
+def geog777_proj1(): 
+    print('returning index!')
+    return blueprint.send_static_file('index.html')
 
 @blueprint.route('/run', methods=['POST'])
 def idw_correlation():
