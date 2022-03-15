@@ -18,6 +18,7 @@ from affine import Affine
 from rasterstats import zonal_stats
 
 from api.modules.NitrateCancer import idw
+# blueprint = Blueprint('NitrateCancer', __name__)
 
 blueprint = Blueprint('NitrateCancer', __name__,
     static_folder='./../../../build')
