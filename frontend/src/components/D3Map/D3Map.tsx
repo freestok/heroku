@@ -2,117 +2,329 @@ import * as d3 from 'd3';
 // import * as topojson from 'topojson-server';
 import * as topojson from 'topojson-client';
 import { GeometryObject, Topology } from 'topojson-specification';
-import React, { FC, useEffect, useRef } from 'react';
+import React, { FC, useEffect, useRef, useState } from 'react';
 import styles from './D3Map.module.css';
-import { Box, Center, Container, Flex, VStack } from "@chakra-ui/react";
+import { Box, Center, Container, Flex, VStack, Text, HStack } from "@chakra-ui/react";
+import { Feature, Polygon, Point, GeoJsonProperties } from 'geojson';
+import chroma from 'chroma-js';
+import d3Legend, { legendColor } from 'd3-svg-legend';
 
-interface D3MapProps { data: any }
+interface D3MapProps {
+  data: any,
+  passD3Data: React.Dispatch<React.SetStateAction<D3DataProps>>,
+  complete: boolean
+}
 
+interface D3DataProps {
+  nitrate: D3Feature;
+  tracts: D3Feature;
+  analysisResults: any;
+}
+
+interface D3Feature {
+  type: string;
+  features: Array<any>;
+}
 // https://levelup.gitconnected.com/react-d3-rendering-a-map-5e006b2f4895
 
 
 const width = 500;
 const height = 950;
-let zoomLevel = 0;
-function zoomed(g: any) {
-  g
-    .selectAll('path') // To prevent stroke width from scaling
-    .attr('transform', d3.zoomTransform);
+const diverging = chroma
+  .scale('PuOr')
+  .colors(8);
+// .classes([-2.5,-1.5,-0.5,0.5,1.5,2.5])
+// .colors(7);
+
+console.log('diverging', diverging);
+
+////////////////////////////////////////////////////// 
+// RENDER THE CHART USING D3
+//////////////////////////////////////////////////////   
+const renderInitialMap = (data: any, path: any, svgRef: any) => {
+  console.log('data', data);
+  // console.log('path', path);
+  const svg = d3.select(svgRef.current);
+  svg.selectAll('*').remove();
+
+  const g = svg.append('g');
+  g.selectAll('path')
+    .data(data.features).enter().append('path')
+    // .attr('class', (d: any) => d.properties.name)
+    .attr('class', () => 'tractPath')
+    .attr('d', path)
+    .style('fill', (d: any) => '#5d80b4')
+    // .append('tractBorders')
+    .style("stroke-width", "0.25")
+    .style("stroke", "black");
+
+
+  const zoom = d3.zoom()
+    .scaleExtent([1, 25])
+    .on('zoom', (event) => {
+      g.selectAll('path').attr('transform', event.transform)
+    });
+  svg.call(zoom);
+};
+
+const getColor = (val: any) => {
+  // diverging
+  // console.log(val);
+  return val < -2.5 ? diverging[0] :
+    val <= -1.5 ? diverging[1] :
+      val <= -0.5 ? diverging[2] :
+        val <= 0.5 ? diverging[3] :
+          val <= 1.5 ? diverging[5] :
+            val <= 2.5 ? diverging[6] :
+              val > 2.5 ? diverging[7] :
+                'grey';
 }
+
+const renderResult = (data: any, path: any, svgRef: React.MutableRefObject<any>, setPopup: React.Dispatch<React.SetStateAction<PopupInfoProps>>) => {
+  // if a user changes radio button, it changes which column the 
+  // fill is based on; defaults to cancer rate
+  const fieldSymbol = (data.symbol) ? data.symbol : 'canrate';
+
+  // console.log('data', data);
+  const tempObj: any = {}
+  data.features.map((e: any) => tempObj[e.properties.GEOID10?.toString()] = e);
+  // console.log('path', path);
+
+  // console.log('d3.selectAll', d3.selectAll('path'));
+  d3.selectAll('path')
+    .style('fill', (d: any) => {
+      if (d) {
+        // console.log('d', d);
+        const otherInfo = tempObj[d.properties.GEOID10];
+        if (otherInfo) {
+          return getColor(tempObj[d.properties.GEOID10].properties[fieldSymbol]);
+        }
+        // // console.log('otherInfo', otherInfo);
+        // console.log('fieldSymbol', fieldSymbol);
+      }
+      return null;
+    })
+    .on('mouseover', (event, d: any) => {
+      const otherInfo = tempObj[d.properties.GEOID10];
+      // otherInfo.properties.symbol = fieldSymbol;
+      if (otherInfo) {
+        const popupContent = {
+          data: otherInfo.properties,
+          title: otherInfo.properties.GEOID10,
+          symbol: fieldSymbol
+        }
+        // console.log('popupContent', popupContent);
+        setPopup(popupContent);
+      }
+    });
+};
+
+// function getPopupInfo(data) {
+
+// }
+interface PopupInfoProps {
+  title: string;
+  data: any; // data from setPopup method
+  symbol: string;
+}
+
+const aliasMapper: any = {
+  canrate: 'Cancer Rate',
+  mean: 'Average Nitrate',
+  fitVal: 'Predicted Cancer Rate',
+  residuals: 'Residual',
+  stdResid: 'Standardized Residual'
+}
+const PopupInfo: FC<PopupInfoProps> = (props: PopupInfoProps) => {
+  const svgRef = useRef<any>(null);
+  const svg = d3.select(svgRef.current);
+  const [legendTitle, setLegendTitle] = useState('')
+  svgLegend(svg, 'canrate')
+
+  useEffect(() => {
+    console.log('POPUP USE EFFECT')
+    const symbolName = props.symbol ? props.symbol : 'canrate'
+    svgLegend(svg, symbolName);
+    setLegendTitle(aliasMapper[symbolName])
+  }, [props.symbol])
+
+  return (
+    <Box p={2} ml={3} mr={3} borderWidth={1} w='full' h='full' borderRadius={8} bg="purple.100" boxShadow="lg">
+
+      {props.data
+        ?
+        <HStack spacing='2px'>
+          <Box p={2} ml={3} mr={3} w='full' h='full'>
+            <Text fontSize="2xl" fontWeight="bold">
+              Tract {props.title}
+            </Text>
+            <Text>Cancer Rate: {props.data?.canrate.toFixed(3)}</Text>
+            <Text>Average Nitrate: {props.data?.mean.toFixed(3)}</Text>
+            <Text>Predicted Cancer Rate: {props.data?.fitVal.toFixed(3)}</Text>
+            <Text>Residual: {props.data?.residuals.toFixed(3)}</Text>
+            <Text>Standardized Residual: {props.data?.stdResid.toFixed(3)}</Text>
+
+          </Box>
+          <Box p={2} ml={3} mr={3} w='full' h='full'>
+            <Center h='10' >
+              <Text fontSize="2xl">
+                {legendTitle}
+              </Text>
+            </Center>
+            <Center>
+              <svg ref={svgRef}
+                style={{
+                  height: "100%",
+                  width: "22em",
+                  marginRight: "0em",
+                  marginLeft: "0em",
+                  marginTop: "0em",
+                  marginBottom: "0em"
+                }} />
+            </Center>
+          </Box>
+        </HStack>
+        :
+        <Center h='10' >
+          <Text fontSize="2xl">
+            Hover over tracts to get more info...
+          </Text>
+        </Center>
+      }
+    </Box>
+  )
+};
+
 const D3Map: FC<D3MapProps> = (props: D3MapProps) => {
+
   //////////////////////////////////////////////////////
   // REFs
   //////////////////////////////////////////////////////
+  const componentRef = useRef<any>(null);
   const svgRef = useRef<any>(null);
   const projRef = useRef(d3.geoMercator()
     .center([-89.8024, 44.5381])
-    .scale(4000));
+    .scale(4500));
+  const [symbol, setSymbol] = useState('');
+  const [popup, setPopup] = useState({ data: null, title: null } as unknown as PopupInfoProps);
+  const { nitrateFile, tractsFile } = props.data;
 
-  //////////////////////////////////////////////////////
-  // USEEFFECT AS COMPONENTDIDUPDATE WITH DEPENDENCY
-  //////////////////////////////////////////////////////
+  // const topoFeat = topojson.feature
+  const nitrateTopo = topojson.feature(nitrateFile, nitrateFile.objects.nitrate_wgs84) as unknown as D3Feature;
+  const tractsTopo = topojson.feature(tractsFile, tractsFile.objects.cancer_tracts_wgs84) as unknown as D3Feature;
+  const path = d3.geoPath().projection(projRef.current)
+
   useEffect(() => {
-    async function setData() {
-      console.log('d3Map!', props);
-      console.log(props.data)
-      // const nitrate = await d3.json(props.data.nitrateFile);
-      // console.log('ntirate ', nitrate);
-      // const tractsFile = await d3.json(props.data.tractsFile);
-      // console.log('tractsFile', tractsFile);
+    props.passD3Data({
+      nitrate: nitrateTopo,
+      tracts: tractsTopo,
+      analysisResults: props.data.analysisResults
+    });
 
-      const { nitrateFile, tractsFile } = props.data;
-      console.log('nitrate', nitrateFile);
-
-      // const topoFeat = topojson.feature
-      const nitrateTopo = topojson.feature(nitrateFile, nitrateFile.objects.nitrate_wgs84);
-      const tractsTopo = topojson.feature(tractsFile, tractsFile.objects.cancer_tracts_wgs84)
-      console.log('nitrateTopo', nitrateTopo);
-      // const height = svgRef.current.clientHeight
-      // const width = svgRef.current.clientWidth
-      // console.log('height', height);
-      // console.log('width', width);
-
-      console.log('blah');
-      // projRef.current.translate([width / 2, height / 2]);
-      const path = d3.geoPath().projection(projRef.current)
-      // if (props.data.length) {
-      // }
-      // renderChart(nitrateTopo, path);
-      renderChart(tractsTopo, path);
-
+    if (props.data.analysisResults) {
+      console.log('RENDER RESULT')
+      setSymbol(props.data.analysisResults.symbol);
+      renderResult(props.data.analysisResults, path, svgRef, setPopup);
+    } else {
+      renderInitialMap(tractsTopo, path, svgRef);
     }
-    setData();
   }, [props.data])
-  ////////////////////////////////////////////////////// 
-  // RENDER THE CHART USING D3
-  //////////////////////////////////////////////////////   
-  const renderChart = (data: any, path: any) => {
-    console.log('data', data);
-    // console.log('path', path);
-    const svg = d3.select(svgRef.current);
 
-    const g = svg.append('g');
-    g
-      .selectAll('path')
-      .data(data.features).enter().append('path')
-      .attr('class', (d: any) => d.properties.name)
-      .attr('d', path)
-      .style('fill', (d: any) => '#5d80b4')
-      .style("stroke-width", "1")
-      .style("stroke", "black");
+  const size = useWindowSize();
 
-
-    const zoom = d3.zoom()
-      .scaleExtent([1, 8])
-      .on('zoom',  (event) => {
-
-        g.selectAll('path').attr('transform', event.transform);
-    //     g.selectAll("circle")
-    //     .attr("d", path.projection(projRef.current))
-    //     .attr("r", 5/event.scale);
-    // g.selectAll("path")  
-    //     .attr("d", path.projection(projRef.current)); 
-      });
-    svg.call(zoom);
-  };
-  ////////////////////////////////////////////////////// 
-  // RENDER THE SVG
-  //////////////////////////////////////////////////////
   return (
-    <div className={styles.D3Map}>
-      {/* <Flex h='100vh'  bg='green.100'> */}
-      <svg  ref={svgRef}
-        viewBox={`0 0 ${height} ${width}`}
-        style={{
-          height: "100%",
-          marginRight: "0px",
-          marginLeft: "0px",
-          marginTop: "1em"
-        }} />
-
-      {/* </Flex> */}
+    <div ref={componentRef} className={styles.D3Map}>
+      <VStack>
+        <svg ref={svgRef}
+          viewBox={props.complete ? `0 -80 ${size.width} ${size.height}` : `0 -175 ${size.width * 1.25} ${size.height * 1.5}`}
+          style={{
+            height: "50%",
+            marginRight: "0px",
+            marginLeft: "0px",
+            marginTop: "0em",
+            vectorEffect: "non-scaling-stroke"
+          }} />
+        {props.complete &&
+          <PopupInfo data={popup.data} symbol={symbol} title={popup.title} />
+        }
+      </VStack>
     </div>
   )
 };
+
+function svgLegend(svg: d3.Selection<any, unknown, null, undefined>, type: string) {
+  svg.selectAll('*').remove();
+  svg.append("g")
+    .attr("class", "svgLegend")
+    .attr("transform", "translate(20,20)");
+  let legend: any;
+
+  if (type === 'stdResid') {
+    const scale = d3.scaleThreshold<number, string>()
+      .domain([-2.5, -1.5, -0.5, 0.5, 1.5, 2.5])
+      .range(diverging as unknown as any);
+
+    legend = d3Legend.legendColor()
+      .shapeWidth(35)
+      .labels(['<-2.5', '-2.5', '-1.5', '-0.5', '0.5', '1.5', '2.5', '>2.5'])
+      .orient('horizontal')
+      .scale(scale);
+
+  } else if (type === 'canrate') {
+    console.log('CANRATE')
+
+    const scale = d3.scaleLinear<any>()
+      .domain([0, 10])
+      .range(["rgb(46, 73, 123)", "rgb(71, 187, 94)"]);
+    //  const scale = d3.scaleThreshold<number, string>()
+    // .domain([-2.5, -1.5, -0.5, 0.5, 1.5, 2.5])
+    // .range(diverging as unknown as any);
+    console.log('legend...')
+    legend = d3Legend.legendColor()
+      .shapeWidth(35)
+      .labels(['<-2.5', '-2.5', '-1.5', '-0.5', '0.5', '1.5', '2.5', '>2.5'])
+      .orient('horizontal')
+      .scale(scale);
+    console.log('legend1', legend);
+  } else if (type === 'residuals') {
+
+  } else if (type === 'mean') {
+
+  } else if (type === 'fitVal') {
+
+  }
+  console.log('svg.select....')
+  console.log('legend', legend);
+  svg.select(".svgLegend")
+    .call(legend);
+
+}
+// Hook
+function useWindowSize() {
+  // Initialize state with undefined width/height so server and client renders match
+  // Learn more here: https://joshwcomeau.com/react/the-perils-of-rehydration/
+  const [windowSize, setWindowSize] = useState({
+    width: 0,
+    height: 0,
+  });
+  useEffect(() => {
+    // Handler to call on window resize
+    function handleResize() {
+      console.log(window.innerWidth);
+      // Set window width/height to state
+      setWindowSize({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    }
+    // Add event listener
+    window.addEventListener("resize", handleResize);
+    // Call handler right away so state gets updated with initial window size
+    handleResize();
+    // Remove event listener on cleanup
+    return () => window.removeEventListener("resize", handleResize);
+  }, []); // Empty array ensures that effect is only run on mount
+  return windowSize;
+}
 
 export default D3Map;
