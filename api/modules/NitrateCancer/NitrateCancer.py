@@ -120,7 +120,7 @@ def run_analysis(points, tracts, P, NNEAR, RESOLUTION):
     # gdf = gpd.GeoDataFrame.from_features(study_area["features"])
 
     print('Zonal stats...')
-    stats = zonal_stats(tracts, final_grid, affine=affine)
+    stats = zonal_stats(tracts, final_grid, affine=affine, nodata=-999.)
     df = pd.DataFrame(stats)
     print('Merge to final df...')
     final_df = pd.merge(tracts, df, left_index=True, right_index=True)
