@@ -11,13 +11,11 @@ from flask import (
     session
 )
 import geopandas as gpd
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import statsmodels.api as sm
 from affine import Affine
 from rasterstats import zonal_stats
-from shapely.geometry import Polygon
 
 from api.modules.NitrateCancer import idw
 
