@@ -178,7 +178,7 @@ const SidebarContent = ({ onClose, d3Data, files, setFiles, complete, setComplet
     // fetch('nitrate-cancer/run', requestOptions)
     //   .then(response => response.json())
     //   .then(data => this.setState({ postId: data.id }));
-    const res = await fetch('nitrate-cancer/run', requestOptions);
+    const res = await fetch('/nitrate-cancer/run', requestOptions);
 
     const json = await res.json();
 
@@ -272,7 +272,7 @@ const SidebarContent = ({ onClose, d3Data, files, setFiles, complete, setComplet
           </Box>
           <HStack p={2} mt={4} ml={3} mr={3}>
             <Button bg={'gray.200'} _hover={{ bg: 'gray.300' }}>
-              <Link href='nitrate-cancer/report' isExternal>
+              <Link href='/nitrate-cancer/report' isExternal>
                 Open Report
               </Link>
 
