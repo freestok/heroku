@@ -50,7 +50,7 @@ import { Feature, Point, GeoJsonProperties } from 'geojson';
 import { reduceEachTrailingCommentRange } from 'typescript';
 
 const resolutionDefault = 250;
-const kValDefault = 1;
+const kValDefault = 2;
 // const files = 
 // const NitrateCancer: FC<NitrateCancerProps> = () => (
 //     <div className={styles.NitrateCancer}>
@@ -217,8 +217,8 @@ const SidebarContent = ({ onClose, d3Data, files, setFiles, complete, setComplet
         <form onSubmit={handleSubmit}>
           <FormControl isRequired={true}>
             <FormLabel >K-value:</FormLabel>
-            <FormHelperText><em>Make it {'>='} to 1</em></FormHelperText>
-            <NumberInput defaultValue={kValDefault} min={1} max={10} w='6em'
+            <FormHelperText><em>Make it {'>='} to 1.1</em></FormHelperText>
+            <NumberInput defaultValue={kValDefault} step={0.1} min={1.1} max={10} w='6em'
               onChange={event => setKVal(parseFloat(event))}
             >
               <NumberInputField />
