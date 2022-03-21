@@ -89,7 +89,7 @@ def run_analysis(conn, cur, uid, P, NNEAR, RESOLUTION):
     print('TRACTS SHAPE', tracts.shape)
 
     print('Zonal stats...')
-    stats = zonal_stats(tracts, final_grid, affine=affine)
+    stats = zonal_stats(tracts, final_grid, affine=affine, nodata=-999.)
     df = pd.DataFrame(stats)
     print('Merge to final df...')
     final_df = pd.merge(tracts, df, left_index=True, right_index=True)
