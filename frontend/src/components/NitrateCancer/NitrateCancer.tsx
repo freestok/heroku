@@ -73,10 +73,13 @@ interface D3Feature {
   features: Array<any>;
 }
 
+let currentSymbol = '';
+
 const radioButtonChange = (e: string, files: any, setFiles: any) => {
 
   const json = files.analysisResults;
   json['symbol'] = e;
+  currentSymbol = e;
   setFiles({ nitrateFile: nitrateFile, tractsFile: tractsFile, analysisResults: json })
 }
 
@@ -156,6 +159,7 @@ const SidebarContent = ({ onClose, d3Data, files, setFiles, complete, setComplet
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  
   const handleSubmit = async (event: any) => {
     // console.log(d3Data);
     setLoading(true);
@@ -167,8 +171,8 @@ const SidebarContent = ({ onClose, d3Data, files, setFiles, complete, setComplet
       p: kVal,
       resolution: 500,
       nnear: nnear,
-      points: points,
-      tracts: tracts
+      // points: points,
+      // tracts: tracts
     }
     const requestOptions = {
       method: 'POST',
@@ -180,13 +184,27 @@ const SidebarContent = ({ onClose, d3Data, files, setFiles, complete, setComplet
     //   .then(data => this.setState({ postId: data.id }));
     const res = await fetch('/nitrate-cancer/run', requestOptions);
 
-    const json = await res.json();
 
-    setFiles({ nitrateFile: nitrateFile, tractsFile: tractsFile, analysisResults: json })
-    json['symbol'] = 'canrate';
-    setFiles({ nitrateFile: nitrateFile, tractsFile: tractsFile, analysisResults: json })
-    setLoading(false);
-    setComplete(true);
+    // const json = await res.json();
+
+
+    const interval = setInterval(async () => {
+      const res = await fetch('/nitrate-cancer/check-result');
+      const json = await res.json();
+      console.log('json', json);
+      if (json.type === 'FeatureCollection') {
+        clearInterval(interval);
+
+        // if already complete, set to current symbol, otherwise canrate
+        json['symbol'] = (complete) ? currentSymbol : 'canrate';
+        console.log('json symbol', json['symbol']);
+
+        setFiles({ nitrateFile: nitrateFile, tractsFile: tractsFile, analysisResults: json })
+        setLoading(false);
+        setComplete(true);
+      }
+    }, 2000);
+
 
     // files['analysisResults'] = json;
   }

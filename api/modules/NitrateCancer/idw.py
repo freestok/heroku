@@ -112,6 +112,7 @@ class IDWGenerator:
         # assumes extent is a perfect square, but that isn't necessarily true
         xmin, ymin, xmax, ymax = self.bounds
         # nx = ny = resolution
+        print('resolution', resolution)
         xi = np.linspace(xmin, xmax, resolution)
         yi = np.linspace(ymin, ymax, resolution)
         mesh = np.meshgrid(xi, yi)
