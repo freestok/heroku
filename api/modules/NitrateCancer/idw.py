@@ -2,7 +2,7 @@ import geopandas as gpd
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-# from osgeo import osr, gdal
+from osgeo import osr, gdal
 from rasterstats import zonal_stats
 from scipy.spatial import KDTree
 
@@ -119,30 +119,30 @@ class IDWGenerator:
         flattened = zip(*(i.flat for i in mesh))
         return np.asarray(list(flattened))
 
-    # def export_to_tif(self, grid, output_tif):
-    #     # export to tif
-    #     # https://gis.stackexchange.com/a/37431/78614
-    #     nrows,ncols = np.shape(grid)
-    #     xmin, ymin, xmax, ymax = self.bounds
+    def export_to_tif(self, grid, output_tif):
+        # export to tif
+        # https://gis.stackexchange.com/a/37431/78614
+        nrows,ncols = np.shape(grid)
+        xmin, ymin, xmax, ymax = self.bounds
 
-    #     xres = (xmax-xmin)/float(ncols)
-    #     yres = (ymax-ymin)/float(nrows)
-    #     geotransform=(xmin,xres,0,ymax,0, -yres)
-    #     output_raster = gdal.GetDriverByName('GTiff')\
-    #         .Create(output_tif,ncols, nrows, 1 ,gdal.GDT_Float32) # open file
-    #     output_raster.SetGeoTransform(geotransform) 
+        xres = (xmax-xmin)/float(ncols)
+        yres = (ymax-ymin)/float(nrows)
+        geotransform=(xmin,xres,0,ymax,0, -yres)
+        output_raster = gdal.GetDriverByName('GTiff')\
+            .Create(output_tif,ncols, nrows, 1 ,gdal.GDT_Float32) # open file
+        output_raster.SetGeoTransform(geotransform) 
         
-    #     # set SRS to EPSG 4326 (WGS84)
-    #     srs = osr.SpatialReference()
-    #     srs.ImportFromEPSG(4326)
-    #     output_raster.SetProjection( srs.ExportToWkt() )
+        # set SRS to EPSG 4326 (WGS84)
+        srs = osr.SpatialReference()
+        srs.ImportFromEPSG(4326)
+        output_raster.SetProjection( srs.ExportToWkt() )
 
-    #     # write array to raster
-    #     output_raster.GetRasterBand(1).WriteArray(grid)
+        # write array to raster
+        output_raster.GetRasterBand(1).WriteArray(grid)
 
-    #     # make sure there is no lock on the file
-    #     output_raster.FlushCache()
-    #     output_raster = None
+        # make sure there is no lock on the file
+        output_raster.FlushCache()
+        output_raster = None
 
     def calculate_zonal_stats(self, vector_file, raster_file, output_file):
         tracts = gpd.read_file(vector_file)

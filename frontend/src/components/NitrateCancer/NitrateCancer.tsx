@@ -154,9 +154,9 @@ interface SidebarProps extends BoxProps {
 
 const SidebarContent = ({ onClose, d3Data, files, setFiles, complete, setComplete, ...rest }: SidebarProps) => {
   const [kVal, setKVal] = useState(kValDefault);
-  const [resolution, setResolution] = useState(resolutionDefault);
+  // const [resolution, setResolution] = useState(resolutionDefault);
   const [nnear, setNnear] = useState(8);
-  const [results, setResults] = useState([]);
+  // const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
 
   
@@ -169,7 +169,7 @@ const SidebarContent = ({ onClose, d3Data, files, setFiles, complete, setComplet
     const tracts = d3Data.tracts.features;
     const body = {
       p: kVal,
-      resolution: 500,
+      resolution: 250,
       nnear: nnear,
       // points: points,
       // tracts: tracts

@@ -11,7 +11,7 @@ import statsmodels.api as sm
 from affine import Affine
 from rasterstats import zonal_stats
 
-from modules.NitrateCancer import idw
+from modules.NitrateCancer import idw, gdal_stats
 
 def main():
     while True:
@@ -75,6 +75,8 @@ def run_analysis(conn, cur, uid, P, NNEAR, RESOLUTION):
     final_grid = interpol.reshape((RESOLUTION, RESOLUTION))
     # final_grid = np.transpose(final_grid)
     final_grid = np.flip(final_grid, 0)
+    idw_gen.export_to_tif(final_grid, 'temp_raster.tif')
+
 
     # pure numpy?
     nrows, ncols = np.shape(final_grid) 
@@ -89,8 +91,14 @@ def run_analysis(conn, cur, uid, P, NNEAR, RESOLUTION):
     print('TRACTS SHAPE', tracts.shape)
 
     print('Zonal stats...')
-    stats = zonal_stats(tracts, final_grid, affine=affine, nodata=-999.)
+    fn_zones = os.path.join('static', 'cancer_tracts_wgs84.shp')
+    # api\static\cancer_tracts_wgs84.shp
+    stats = gdal_stats.process('temp_raster.tif', fn_zones)
+    # stats = zonal_stats(tracts, final_grid, affine=affine, nodata=-999.)
     df = pd.DataFrame(stats)
+    print(df.head(10))
+    print(df.shape)
+    print(tracts.shape)
     print('Merge to final df...')
     final_df = pd.merge(tracts, df, left_index=True, right_index=True)
     print(final_df.shape)
@@ -101,6 +109,8 @@ def run_analysis(conn, cur, uid, P, NNEAR, RESOLUTION):
     final_df = final_df[['canrate', 'mean', 'GEOID10']].copy()
     final_df = clean_dataset(final_df)
     final_df['geometry'] = geom
+    print(final_df.head(10))
+    final_df = final_df.dropna()
     Y = final_df.canrate.values.reshape(-1, 1) # 1 column numpy array
     X = final_df['mean'].values.reshape(-1, 1)
 
