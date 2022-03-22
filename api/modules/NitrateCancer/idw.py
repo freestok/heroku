@@ -1,8 +1,10 @@
 import geopandas as gpd
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from osgeo import osr, gdal
+# from osgeo import osr, gdal
+import gdal
+import osr
 from rasterstats import zonal_stats
 from scipy.spatial import KDTree
 

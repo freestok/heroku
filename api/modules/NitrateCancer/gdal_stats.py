@@ -1,5 +1,7 @@
-from osgeo import gdal
-from osgeo import ogr
+# from osgeo import gdal
+# from osgeo import ogr
+import gdal
+import ogr
 import os
 import numpy as np
 import csv
