@@ -1,0 +1,45 @@
+.EsriMap {
+  height: 88%;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 75% 25%;
+  grid-template-areas: 
+    'map sidebar';
+}
+
+.mapDiv {
+  grid-area: map;
+}
+
+.sidebar {
+  grid-area: sidebar;
+  overflow-y: overlay;
+}
+
+
+@media only screen and (max-width: 770px) {
+  .EsriMap {
+    height: 100%;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 100%;
+    grid-template-rows: 50% 1fr;
+    overflow-y: auto;
+    grid-template-areas: 
+      'map'
+      'footer';
+  }
+
+  .mapDiv {
+    grid-area: map;
+    height: 100%;
+  }
+  
+  .sidebar {
+    grid-area: footer;
+    /* max-height: 25%; */
+    overflow: overlay;
+  }
+}
+
+
