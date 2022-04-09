@@ -38,11 +38,6 @@ const CardAccordion: FC<SmallCardProps> = ({ name, key, img }) => {
         ? <CardWithImage img={img} name={name} setIsActive={setIsActive} />
         : <div style={{ cursor: 'pointer' }} onClick={() => setIsActive(true)}>
           <SmallCard name={name} key={key} img={img} />
-          <SmallCard name={name} key={key} img={img} />
-          <SmallCard name={name} key={key} img={img} />
-          <SmallCard name={name} key={key} img={img} />
-          <SmallCard name={name} key={key} img={img} />
-
         </div>
       }
     </Box>
