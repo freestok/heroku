@@ -1,6 +1,6 @@
 from flask import Blueprint
 
-blueprint = Blueprint('NitrateCancer', __name__,
+blueprint = Blueprint('JohnBallZoo', __name__,
     static_folder='./../../../build')
 
 @blueprint.route('/')
