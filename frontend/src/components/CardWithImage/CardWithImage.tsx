@@ -9,6 +9,7 @@ import {
   Button,
   HStack,
   Flex,
+  Link,
   Container,
   Icon,
   Spacer,
@@ -16,28 +17,61 @@ import {
 } from '@chakra-ui/react';
 
 import {
-  FiXCircle
+  FiExternalLink,
+  FiXCircle,
+  FiStar
 } from 'react-icons/fi';
 import { FC, useState } from 'react';
 
+
+const statusDomain: any = {
+  EW: 'Extinct in the Wild',
+  CR: 'Critically Endangered',
+  EN: 'Endangered',
+  VU: 'Vulnerable',
+  NT: 'Near Threatened',
+  CD: 'Conservation Dependent',
+  LC: 'Least Concern',
+  DD: 'Data Deficient',
+  NE: 'Not Evaluated'
+}
 interface SmallCardProps {
   name: string,
-  key: number,
-  img: string
+  exhibitId: number,
+  img: string,
+  conservation: string,
+  img_credit: string,
+  scientificName: string,
+  wiki: string
 }
 
 interface SmallCardContainerProps {
   items: SmallCardProps[];
 }
 
-const CardAccordion: FC<SmallCardProps> = ({ name, key, img }) => {
+const CardAccordion: FC<any> = ({ name, license_link, exhibitId, img, conservation, img_credit, scientificName, wiki }) => {
   const [isActive, setIsActive] = useState(false);
   return (
-    <Box maxW={300}>
+    <Box>
       {isActive
-        ? <CardWithImage img={img} name={name} setIsActive={setIsActive} />
+        ? <CardWithImage
+          name={name}
+          exhibitId={exhibitId}
+          img={img}
+          conservation={conservation}
+          img_credit={img_credit}
+          scientificName={scientificName}
+          wiki={wiki}
+          setIsActive={setIsActive}
+          license_link={license_link} />
         : <div style={{ cursor: 'pointer' }} onClick={() => setIsActive(true)}>
-          <SmallCard name={name} key={key} img={img} />
+          <SmallCard name={name}
+            exhibitId={exhibitId}
+            img={img}
+            conservation={conservation}
+            img_credit={img_credit}
+            scientificName={scientificName}
+            wiki={wiki} />
         </div>
       }
     </Box>
@@ -46,7 +80,7 @@ const CardAccordion: FC<SmallCardProps> = ({ name, key, img }) => {
 
 // type SmallCardContainerProps = SmallCardProps[];
 // interface SmallCardContainerProps extends Array<SmallCardContainerProps>{};
-const SmallCardContainer: FC<SmallCardContainerProps> = ({ items }) => (
+const SmallCardContainer: FC<any> = ({ items }) => (
   <Center py={1}>
     <Box w='100%' rounded={'md'} py={3} my={2} mx={3}>
       <VStack>
@@ -61,8 +95,15 @@ const SmallCardContainer: FC<SmallCardContainerProps> = ({ items }) => (
             Animals
           </Heading>
         </Center>
-        {items.map((item, i) => (
-          <CardAccordion img={item.img} key={item.key} name={item.name} />
+        {items.map((item: any) => (
+          <CardAccordion name={item.name}
+            exhibitId={item.exhibitId}
+            img={item.img}
+            conservation={item.conservation}
+            img_credit={item.img_credit}
+            scientificName={item.scientificName}
+            wiki={item.wiki}
+            license_link={item.license_link} />
         ))}
       </VStack>
     </Box>
@@ -72,7 +113,7 @@ const SmallCardContainer: FC<SmallCardContainerProps> = ({ items }) => (
 const SmallCard: FC<SmallCardProps> = ({ name, img }) => (
   <Center py={1}>
     <Box
-      w={{ base: '30em', md: '10em', lg: '10em' }}
+      w={{ base: '30em', md: '15em', lg: '15em' }}
       bg={useColorModeValue('white', 'gray.900')}
       boxShadow={'lg'}
       rounded={'md'}
@@ -102,7 +143,7 @@ const SmallCard: FC<SmallCardProps> = ({ name, img }) => (
 );
 
 
-const CardWithImage: FC<any> = (props: any) => (
+const CardWithImage: FC<any> = ({ img, setIsActive, conservation, name, scientificName, wiki, img_credit, license_link }) => (
   <div className='cardWithImage'>
     <Center py={3}>
       <Box
@@ -117,13 +158,13 @@ const CardWithImage: FC<any> = (props: any) => (
           bg={'gray.100'}
           mt={-6}
           mx={-6}
-          mb={6}
+          mb={0}
           pos={'relative'}>
           <Flex w={'full'}
             // h={'100vh'}
             h='full'
             backgroundImage={
-              `url(${props.img})`
+              `url(${img})`
             }
             backgroundSize={'cover'}
             backgroundPosition={'center center'}>
@@ -135,11 +176,7 @@ const CardWithImage: FC<any> = (props: any) => (
               h={10}
               m={2}
               bg='whiteAlpha.300'
-              onClick={() => {
-                console.log('click!');
-                console.log('props', props);
-                props.setIsActive(false)
-              }}
+              onClick={() => setIsActive(false)}
             >
               <Center>
                 <Icon
@@ -151,13 +188,17 @@ const CardWithImage: FC<any> = (props: any) => (
           </Flex>
         </Box>
         <Stack>
+          <Text fontSize='x-small' as='i' mb={3}>
+            Image credit: <Link href={license_link} isExternal>{img_credit}</Link>
+          </Text>
+
           <Text
             color={'green.500'}
             textTransform={'uppercase'}
             fontWeight={800}
             fontSize={'lg'}
             letterSpacing={1.1}>
-            {props.name}
+            {name}
           </Text>
           <Heading
             as='i'
@@ -165,26 +206,76 @@ const CardWithImage: FC<any> = (props: any) => (
             fontSize={'md'}
             fontWeight='normal'
             fontFamily={'body'}>
-            Scientific name
+            {scientificName}
           </Heading>
-          <Text color={'gray.500'}>
-            Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam
-            nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam
-            erat, sed diam voluptua. At vero eos et accusam et justo duo dolores
-            et ea rebum.
-          </Text>
+          <Box id="conservation" bg='purple.100' p={3} mb={3} dropShadow={'lg'} rounded={'lg'}>
+
+            <Center>
+              <Text>
+                Conservation Status
+              </Text>
+            </Center>
+            <HStack>
+              <Center w='40px' h='40px' borderRadius='50%' border='2px'
+                bg={(conservation === 'CR') ? 'red.700' : 'white'}
+                color={(conservation === 'CR') ? 'white' : 'black'}
+                borderColor='black'>
+                CR
+              </Center>
+              <Center w='40px' h='40px' borderRadius='50%' border='2px'
+                bg={(conservation === 'EN') ? 'red.500' : 'white'}
+                color={(conservation === 'EN') ? 'white' : 'black'}
+                borderColor='black'>
+
+                EN
+              </Center>
+              <Center w='40px' h='40px' borderRadius='50%' border='2px'
+                bg={(conservation === 'VU') ? 'red.300' : 'white'}
+                color={(conservation === 'VU') ? 'white' : 'black'}
+                borderColor='black'>
+
+                VU
+              </Center>
+              <Center w='40px' h='40px' borderRadius='50%' border='2px'
+                bg={(conservation === 'NT') ? 'yellow.400' : 'white'}
+                color={(conservation === 'NT') ? 'white' : 'black'}
+                borderColor='black'>
+                NT
+              </Center>
+              <Center w='40px' h='40px' borderRadius='50%' border='2px'
+                bg={(conservation === 'LC') ? 'green.400' : 'white'}
+                color={(conservation === 'LC') ? 'white' : 'black'}
+                borderColor='black'>
+
+                LC
+              </Center>
+            </HStack>
+            <Center>
+              <b>{statusDomain[conservation]}</b>
+            </Center>
+          </Box>
+          <Link href={wiki} isExternal>
+            <Button>
+              Read More <Icon ml={3} as={FiExternalLink}></Icon>
+            </Button>
+          </Link>
         </Stack>
         <Stack mt={6} direction={'row'} spacing={4} align={'center'}>
+
           {/* <Avatar
           src={'https://avatars0.githubusercontent.com/u/1164541?v=4'}
         // alt={'Author'}
         /> */}
-          <Button>
-            Click Me
-          </Button>
-          <Stack direction={'column'} spacing={0} fontSize={'sm'}>
-            <Text fontWeight={600}>Achim Rolle</Text>
-            <Text color={'gray.500'}>Feb 08, 2021 · 6min read</Text>
+
+          <Stack direction={'column'} spacing={2} fontSize={'md'}>
+            <Text fontWeight={600}>Rate this exhibit!</Text>
+            <HStack>
+              <Icon as={FiStar} />
+              <Icon as={FiStar} />
+              <Icon as={FiStar} />
+              <Icon as={FiStar} />
+              <Icon as={FiStar} />
+            </HStack>
           </Stack>
         </Stack>
       </Box>
