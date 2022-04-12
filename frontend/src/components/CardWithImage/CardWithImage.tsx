@@ -22,6 +22,7 @@ import {
   FiStar
 } from 'react-icons/fi';
 import { FC, useState } from 'react';
+import FiveStar from '../FiveStar/FiveStar';
 
 
 const statusDomain: any = {
@@ -96,7 +97,9 @@ const SmallCardContainer: FC<any> = ({ items }) => (
           </Heading>
         </Center>
         {items.map((item: any) => (
-          <CardAccordion name={item.name}
+          <CardAccordion
+            key={item.name}
+            name={item.name}
             exhibitId={item.exhibitId}
             img={item.img}
             conservation={item.conservation}
@@ -109,11 +112,10 @@ const SmallCardContainer: FC<any> = ({ items }) => (
     </Box>
   </Center>
 );
-
 const SmallCard: FC<SmallCardProps> = ({ name, img }) => (
   <Center py={1}>
     <Box
-      w={{ base: '30em', md: '15em', lg: '15em' }}
+      w={{ base: '30em', md: '10em', lg: '15em' }}
       bg={useColorModeValue('white', 'gray.900')}
       boxShadow={'lg'}
       rounded={'md'}
@@ -142,12 +144,36 @@ const SmallCard: FC<SmallCardProps> = ({ name, img }) => (
   </Center>
 );
 
+interface ConservationInterface {
+  val: string;
+  conservation: string;
+  color: string;
+  scale: {
+    base: string;
+    md: string;
+    lg: string;
+  };
+}
+const ConservationIndicator: FC<ConservationInterface> = ({ val, conservation, color, scale }) => (
+  <Center
+    w={{ base: scale.base, md: scale.md, lg: scale.lg }}
+    h={{ base: scale.base, md: scale.md, lg: scale.lg }}
+    borderRadius='50%'
+    border='2px'
+    fontSize={'sm'}
+    bg={(conservation === val) ? color : 'white'}
+    color={(conservation === val) ? 'white' : 'black'}
+    borderColor='black'>
+    {val}
+  </Center>
+);
 
 const CardWithImage: FC<any> = ({ img, setIsActive, conservation, name, scientificName, wiki, img_credit, license_link }) => (
   <div className='cardWithImage'>
     <Center py={3}>
       <Box
-        w={'full'}
+        // w={'full'}
+        w={{ base: '30em', md: '10em', lg: '15em' }}
         bg={useColorModeValue('white', 'gray.900')}
         boxShadow={'lg'}
         rounded={'md'}
@@ -215,41 +241,40 @@ const CardWithImage: FC<any> = ({ img, setIsActive, conservation, name, scientif
                 Conservation Status
               </Text>
             </Center>
-            <HStack>
-              <Center w='40px' h='40px' borderRadius='50%' border='2px'
-                bg={(conservation === 'CR') ? 'red.700' : 'white'}
-                color={(conservation === 'CR') ? 'white' : 'black'}
-                borderColor='black'>
-                CR
-              </Center>
-              <Center w='40px' h='40px' borderRadius='50%' border='2px'
-                bg={(conservation === 'EN') ? 'red.500' : 'white'}
-                color={(conservation === 'EN') ? 'white' : 'black'}
-                borderColor='black'>
-
-                EN
-              </Center>
-              <Center w='40px' h='40px' borderRadius='50%' border='2px'
-                bg={(conservation === 'VU') ? 'red.300' : 'white'}
-                color={(conservation === 'VU') ? 'white' : 'black'}
-                borderColor='black'>
-
-                VU
-              </Center>
-              <Center w='40px' h='40px' borderRadius='50%' border='2px'
-                bg={(conservation === 'NT') ? 'yellow.400' : 'white'}
-                color={(conservation === 'NT') ? 'white' : 'black'}
-                borderColor='black'>
-                NT
-              </Center>
-              <Center w='40px' h='40px' borderRadius='50%' border='2px'
-                bg={(conservation === 'LC') ? 'green.400' : 'white'}
-                color={(conservation === 'LC') ? 'white' : 'black'}
-                borderColor='black'>
-
-                LC
-              </Center>
-            </HStack>
+            <Center>
+              <HStack>
+                <ConservationIndicator
+                  val='CR'
+                  color='red.700'
+                  conservation={conservation}
+                  scale={{ base: '40px', md: '20px', lg: '30px' }}
+                />
+                <ConservationIndicator
+                  val='EN'
+                  color='red.500'
+                  conservation={conservation}
+                  scale={{ base: '40px', md: '20px', lg: '30px' }}
+                />
+                <ConservationIndicator
+                  val='VU'
+                  color='red.300'
+                  conservation={conservation}
+                  scale={{ base: '40px', md: '20px', lg: '30px' }}
+                />
+                <ConservationIndicator
+                  val='NT'
+                  color='yellow.400'
+                  conservation={conservation}
+                  scale={{ base: '40px', md: '20px', lg: '30px' }}
+                />
+                <ConservationIndicator
+                  val='LC'
+                  color='green.400'
+                  conservation={conservation}
+                  scale={{ base: '40px', md: '20px', lg: '30px' }}
+                />
+              </HStack>
+            </Center>
             <Center>
               <b>{statusDomain[conservation]}</b>
             </Center>
@@ -269,13 +294,7 @@ const CardWithImage: FC<any> = ({ img, setIsActive, conservation, name, scientif
 
           <Stack direction={'column'} spacing={2} fontSize={'md'}>
             <Text fontWeight={600}>Rate this exhibit!</Text>
-            <HStack>
-              <Icon as={FiStar} />
-              <Icon as={FiStar} />
-              <Icon as={FiStar} />
-              <Icon as={FiStar} />
-              <Icon as={FiStar} />
-            </HStack>
+            <FiveStar />
           </Stack>
         </Stack>
       </Box>

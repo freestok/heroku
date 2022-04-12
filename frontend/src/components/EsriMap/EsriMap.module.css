@@ -14,7 +14,7 @@
 .sidebar {
   grid-area: sidebar;
   max-height: 100%;
-  overflow: overlay;
+  overflow: auto;
 }
 
 
@@ -39,7 +39,7 @@
   .sidebar {
     grid-area: footer;
     /* max-height: 25%; */
-    overflow: overlay;
+    overflow: auto;
   }
 }
 
