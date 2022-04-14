@@ -294,7 +294,7 @@ const CardWithImage: FC<any> = ({ img, setIsActive, conservation, name, scientif
 
           <Stack direction={'column'} spacing={2} fontSize={'md'}>
             <Text fontWeight={600}>Rate this exhibit!</Text>
-            <FiveStar />
+            <FiveStar animalName={name}/>
           </Stack>
         </Stack>
       </Box>

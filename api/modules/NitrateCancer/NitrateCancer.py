@@ -11,15 +11,15 @@ from flask import (
 )
 
 
-blueprint = Blueprint('NitrateCancer', __name__,
+NitrateBlueprint = Blueprint('NitrateCancer', __name__,
     static_folder='./../../../build')
 
-@blueprint.route('/')
+@NitrateBlueprint.route('/')
 def geog777_proj1(): 
     print('returning index!')
-    return blueprint.send_static_file('index.html')
+    return NitrateBlueprint.send_static_file('index.html')
 
-@blueprint.route('/run', methods=['POST'])
+@NitrateBlueprint.route('/run', methods=['POST'])
 def idw_correlation():
     print('start!!!!!')
     req = request.json
@@ -57,14 +57,14 @@ def idw_correlation():
     
     return {'status': 'loading'}
 
-@blueprint.route('/report', methods=['GET'])
+@NitrateBlueprint.route('/report', methods=['GET'])
 def show_report():
     if session.get('results_html'):
         return render_template_string(session['results_html'])
     else:
         return render_template_string('No report available...')
 
-@blueprint.route('/check-result', methods=['GET'])
+@NitrateBlueprint.route('/check-result', methods=['GET'])
 def check_result():
     if session.get('uid'):
         conn = psycopg2.connect(os.environ['DATABASE_URL'],sslmode='require')
