@@ -1,6 +1,8 @@
 import { Box, HStack, Icon, Stack, Text } from '@chakra-ui/react';
 import React, { FC, useState, useEffect } from 'react';
 import { AiFillStar } from 'react-icons/ai';
+// import FiveStarModal from '../FiveStarModal/FiveStarModal';
+import FiveStarModal from '../FiveStarModal/FiveStarModal';
 import styles from './FiveStar.module.css';
 
 interface FiveStarProps {
@@ -27,6 +29,7 @@ async function createRating(rating: number, name: string) {
   //   .then(data => this.setState({ postId: data.id }));
   const res = await fetch('/john-ball-zoo/set-rating', requestOptions);
   console.log('res', res);
+  return res;
 }
 
 async function getRating(name: string) {
@@ -42,10 +45,13 @@ const FiveStar: FC<FiveStarProps> = ({ animalName }) => {
   const [rated, setRated] = useState(-1);
   const [totalRatings, setTotalRatings] = useState(-1);
   const [currentAvg, setCurrentAvg] = useState(-1);
+  const [allRatings, setAllRatings] = useState(null as any);
   useEffect(() => {
     console.log('useEffect!!')
     getRating(animalName).then(ratings => {
       console.log('ratings', ratings);
+      setAllRatings(ratings.all_ratings);
+      console.log('***setAllRatings', allRatings)
       if (ratings.avg && ratings.total) {
         setCurrentAvg(ratings.avg);
         setTotalRatings(ratings.total);
@@ -69,8 +75,8 @@ const FiveStar: FC<FiveStarProps> = ({ animalName }) => {
                   as={AiFillStar}
                   color={index <= (hover || rating) ? "yellow.400" : "grey"}
                   w={8} h={8}
-                  onClick={() => {
-                    createRating(hover, animalName)
+                  onClick={async () => {
+                    await createRating(hover, animalName)
                     setRated(hover);
                   }}
                 />
@@ -78,15 +84,19 @@ const FiveStar: FC<FiveStarProps> = ({ animalName }) => {
             );
           })}
         </HStack>
-        <Box>
-          <HStack>
-            <Text>
-              Total Ratings: {totalRatings}<br />
-              Average: {currentAvg.toFixed(1)}/5
-            </Text>
-            <Icon as={AiFillStar} w={5} h={5} color='yellow.400' />
-          </HStack>
-        </Box>
+        {currentAvg !== -1 &&
+          <Box>
+            <Stack>
+              <HStack>
+                <Text>
+                  Average Rating: {currentAvg.toFixed(1)}/5
+                </Text>
+                <Icon as={AiFillStar} w={5} h={5} color='yellow.400' />
+              </HStack>
+              {allRatings && <FiveStarModal ratings={allRatings} />}
+            </Stack>
+          </Box>
+        }
       </Stack>
     </div>
   )
