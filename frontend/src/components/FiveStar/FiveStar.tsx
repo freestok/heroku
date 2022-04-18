@@ -77,10 +77,12 @@ const FiveStar: FC<FiveStarProps> = ({ animalName }) => {
                   color={index <= (hover || rating) ? "yellow.400" : "grey"}
                   w={8} h={8}
                   onClick={async () => {
-                    setShowMessge(true);
-                    await createRating(index, animalName)
-                    setRated(index);
-                    setRating(index);
+                    if (rated === -1) {
+                      setShowMessge(true);
+                      await createRating(index, animalName)
+                      setRated(index);
+                      setRating(index);
+                    }
                   }}
                   style={{ cursor: 'pointer' }}
                 />
