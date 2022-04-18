@@ -15,7 +15,19 @@ import {
   useDisclosure,
   useColorModeValue,
   Stack,
+  Icon,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  ListItem,
+  UnorderedList,
+  Text
 } from '@chakra-ui/react';
+import { AiFillGithub } from 'react-icons/ai';
 // import { HamburgerIcon, CloseIcon, AddIcon } from '@chakra-ui/icons';
 
 const Links = ['Dashboard', 'Projects', 'Team'];
@@ -49,47 +61,54 @@ export default function NavBar() {
             onClick={isOpen ? onClose : onOpen}
           />
           <HStack spacing={8} alignItems={'center'}>
-            <Box>Logo</Box>
-            <HStack
+            <Box>John Ball Zoo Explorer</Box>
+            {/* <HStack
               as={'nav'}
               spacing={4}
               display={{ base: 'none', md: 'flex' }}>
               {Links.map((link) => (
                 <NavLink key={link}>{link}</NavLink>
               ))}
-            </HStack>
+            </HStack> */}
           </HStack>
           <Flex alignItems={'center'}>
-            <Button
-              variant={'solid'}
-              colorScheme={'teal'}
-              size={'sm'}
-              mr={4}
-              // leftIcon={<AddIcon />}
-              >
-              Action
-            </Button>
-            <Menu>
-              <MenuButton
-                as={Button}
-                rounded={'full'}
-                variant={'link'}
-                cursor={'pointer'}
-                minW={0}>
-                <Avatar
-                  size={'sm'}
-                  src={
-                    'https://images.unsplash.com/photo-1493666438817-866a91353ca9?ixlib=rb-0.3.5&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200&s=b616b2c5b373a80ffc9636ba24f7a4a9'
-                  }
-                />
-              </MenuButton>
-              <MenuList>
-                <MenuItem>Link 1</MenuItem>
-                <MenuItem>Link 2</MenuItem>
-                <MenuDivider />
-                <MenuItem>Link 3</MenuItem>
-              </MenuList>
-            </Menu>
+            <HStack>
+              <Button boxShadow={'sm'} bg='purple.100' onClick={onOpen}>Help</Button>
+
+              <Modal isOpen={isOpen} onClose={onClose} size='md'>
+                <ModalOverlay />
+                <ModalContent>
+                  <ModalHeader>Help</ModalHeader>
+                  <ModalCloseButton />
+                  <ModalBody>
+                    {/* <Bar options={options} data={data} />; */}
+                    {isOpen &&
+                      <Box>
+                        <Text>
+                          Welcome to the John Ball Zoo Explorer. You can do the following:
+                        </Text>
+                        <UnorderedList>
+                          <ListItem>Search for animals</ListItem>
+                          <ListItem>Click on an exhibit to see animal information</ListItem>
+                          <ListItem>Toggle layers on and off</ListItem>
+                          <ListItem>Rate exhibits on a five-star scale</ListItem>
+                          <ListItem>View the breakdown of every animals ratings</ListItem>
+                        </UnorderedList>
+                      </Box>
+                    }
+                  </ModalBody>
+
+                  <ModalFooter>
+                    <Button colorScheme='blue' mr={3} onClick={onClose}>
+                      Close
+                    </Button>
+                  </ModalFooter>
+                </ModalContent>
+              </Modal>
+              <Link href='https://github.com/freestok/heroku' isExternal>
+                <Icon w={8} h={8} color='black' as={AiFillGithub} />
+              </Link>
+            </HStack>
           </Flex>
         </Flex>
 

@@ -1,6 +1,6 @@
-import { Box, HStack, Icon, Stack, Text } from '@chakra-ui/react';
+import { Box, HStack, Icon, keyframes, Stack, Text, Fade } from '@chakra-ui/react';
 import React, { FC, useState, useEffect } from 'react';
-import { AiFillStar } from 'react-icons/ai';
+import { AiFillCheckCircle, AiFillStar } from 'react-icons/ai';
 // import FiveStarModal from '../FiveStarModal/FiveStarModal';
 import FiveStarModal from '../FiveStarModal/FiveStarModal';
 import styles from './FiveStar.module.css';
@@ -44,6 +44,7 @@ const FiveStar: FC<FiveStarProps> = ({ animalName }) => {
   const [hover, setHover] = useState(0);
   const [rated, setRated] = useState(-1);
   const [totalRatings, setTotalRatings] = useState(-1);
+  const [showMessage, setShowMessge] = useState(false);
   const [currentAvg, setCurrentAvg] = useState(-1);
   const [allRatings, setAllRatings] = useState(null as any);
   useEffect(() => {
@@ -76,16 +77,33 @@ const FiveStar: FC<FiveStarProps> = ({ animalName }) => {
                   color={index <= (hover || rating) ? "yellow.400" : "grey"}
                   w={8} h={8}
                   onClick={async () => {
+                    setShowMessge(true);
                     await createRating(index, animalName)
                     setRated(index);
                     setRating(index);
                   }}
-                  style={{cursor: 'pointer'}}
+                  style={{ cursor: 'pointer' }}
                 />
               </Box>
             );
           })}
         </HStack>
+        {/* {showMessage && */}
+        <Fade in={showMessage}>
+          <Box>
+            <HStack>
+              <Text color='green.500'>
+                Thanks for rating!
+              </Text>
+              <Icon
+                color='green.400'
+                w={5}
+                h={5}
+                as={AiFillCheckCircle} />
+            </HStack>
+          </Box>
+        </Fade>
+        {/* } */}
         {currentAvg !== -1 &&
           <Box>
             <Stack>
@@ -95,7 +113,7 @@ const FiveStar: FC<FiveStarProps> = ({ animalName }) => {
                 </Text>
                 <Icon as={AiFillStar} w={5} h={5} color='yellow.400' />
               </HStack>
-              {allRatings && <FiveStarModal ratings={allRatings} />}
+              {allRatings && <FiveStarModal totalRatings={totalRatings} ratings={allRatings} />}
             </Stack>
           </Box>
         }

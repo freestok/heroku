@@ -50,6 +50,8 @@ interface SmallCardContainerProps {
   items: SmallCardProps[];
 }
 
+const cardWidth = { sm: '20em', md: '10em', lg: '15em' }
+
 const CardAccordion: FC<any> = ({ name, license_link, exhibitId, img, conservation, img_credit, scientificName, wiki }) => {
   const [isActive, setIsActive] = useState(false);
   return (
@@ -115,7 +117,7 @@ const SmallCardContainer: FC<any> = ({ items }) => (
 const SmallCard: FC<SmallCardProps> = ({ name, img }) => (
   <Center py={1}>
     <Box
-      w={{ base: '30em', md: '10em', lg: '15em' }}
+      w={cardWidth}
       bg={useColorModeValue('white', 'gray.900')}
       boxShadow={'lg'}
       rounded={'md'}
@@ -173,7 +175,7 @@ const CardWithImage: FC<any> = ({ img, setIsActive, conservation, name, scientif
     <Center py={3}>
       <Box
         // w={'full'}
-        w={{ base: '30em', md: '10em', lg: '15em' }}
+        w={cardWidth}
         bg={useColorModeValue('white', 'gray.900')}
         boxShadow={'lg'}
         rounded={'md'}
@@ -214,9 +216,11 @@ const CardWithImage: FC<any> = ({ img, setIsActive, conservation, name, scientif
           </Flex>
         </Box>
         <Stack>
-          <Text fontSize='x-small' as='i' mb={3}>
-            Image credit: <Link href={license_link} isExternal>{img_credit}</Link>
-          </Text>
+          {img_credit &&
+            <Text fontSize='x-small' as='i' mb={3}>
+              Image credit: <Link href={license_link} isExternal>{img_credit}</Link>
+            </Text>
+          }
 
           <Text
             color={'green.500'}
@@ -234,67 +238,65 @@ const CardWithImage: FC<any> = ({ img, setIsActive, conservation, name, scientif
             fontFamily={'body'}>
             {scientificName}
           </Heading>
-          <Box id="conservation" bg='purple.100' p={3} mb={3} dropShadow={'lg'} rounded={'lg'}>
+          {conservation &&
+            <Box id="conservation" bg='purple.100' p={3} mb={3} dropShadow={'lg'} rounded={'lg'}>
 
-            <Center>
-              <Text>
-                Conservation Status
-              </Text>
-            </Center>
-            <Center>
-              <HStack>
-                <ConservationIndicator
-                  val='CR'
-                  color='red.700'
-                  conservation={conservation}
-                  scale={{ base: '40px', md: '20px', lg: '30px' }}
-                />
-                <ConservationIndicator
-                  val='EN'
-                  color='red.500'
-                  conservation={conservation}
-                  scale={{ base: '40px', md: '20px', lg: '30px' }}
-                />
-                <ConservationIndicator
-                  val='VU'
-                  color='red.300'
-                  conservation={conservation}
-                  scale={{ base: '40px', md: '20px', lg: '30px' }}
-                />
-                <ConservationIndicator
-                  val='NT'
-                  color='yellow.400'
-                  conservation={conservation}
-                  scale={{ base: '40px', md: '20px', lg: '30px' }}
-                />
-                <ConservationIndicator
-                  val='LC'
-                  color='green.400'
-                  conservation={conservation}
-                  scale={{ base: '40px', md: '20px', lg: '30px' }}
-                />
-              </HStack>
-            </Center>
-            <Center>
-              <b>{statusDomain[conservation]}</b>
-            </Center>
-          </Box>
+              <Center>
+                <Text>
+                  Conservation Status
+                </Text>
+              </Center>
+              <Center>
+                <HStack>
+                  <ConservationIndicator
+                    val='CR'
+                    color='red.700'
+                    conservation={conservation}
+                    scale={{ base: '40px', md: '20px', lg: '30px' }}
+                  />
+                  <ConservationIndicator
+                    val='EN'
+                    color='red.500'
+                    conservation={conservation}
+                    scale={{ base: '40px', md: '20px', lg: '30px' }}
+                  />
+                  <ConservationIndicator
+                    val='VU'
+                    color='red.300'
+                    conservation={conservation}
+                    scale={{ base: '40px', md: '20px', lg: '30px' }}
+                  />
+                  <ConservationIndicator
+                    val='NT'
+                    color='yellow.400'
+                    conservation={conservation}
+                    scale={{ base: '40px', md: '20px', lg: '30px' }}
+                  />
+                  <ConservationIndicator
+                    val='LC'
+                    color='green.400'
+                    conservation={conservation}
+                    scale={{ base: '40px', md: '20px', lg: '30px' }}
+                  />
+                </HStack>
+              </Center>
+              <Center>
+                <b>{statusDomain[conservation]}</b>
+              </Center>
+            </Box>
+          }
+          {wiki &&
           <Link href={wiki} isExternal>
             <Button>
               Read More <Icon ml={3} as={FiExternalLink}></Icon>
             </Button>
           </Link>
+          }
         </Stack>
         <Stack mt={6} direction={'row'} spacing={4} align={'center'}>
-
-          {/* <Avatar
-          src={'https://avatars0.githubusercontent.com/u/1164541?v=4'}
-        // alt={'Author'}
-        /> */}
-
           <Stack direction={'column'} spacing={2} fontSize={'md'}>
             <Text fontWeight={600}>Rate this exhibit!</Text>
-            <FiveStar animalName={name}/>
+            <FiveStar animalName={name} />
           </Stack>
         </Stack>
       </Box>

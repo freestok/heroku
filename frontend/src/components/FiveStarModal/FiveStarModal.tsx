@@ -5,10 +5,11 @@ import { VictoryAxis, VictoryBar, VictoryChart, VictoryLabel, VictoryTheme, Vict
 
 interface FiveStartModalProps {
   ratings: any;
+  totalRatings: number
 }
 
 
-const FiveStarModal: FC<FiveStartModalProps> = ({ ratings }) => {
+const FiveStarModal: FC<FiveStartModalProps> = ({ ratings, totalRatings }) => {
   const { isOpen, onOpen, onClose } = useDisclosure()
 
   console.log('FiveStarModal ratings', ratings);
@@ -26,7 +27,7 @@ const FiveStarModal: FC<FiveStartModalProps> = ({ ratings }) => {
       <Modal isOpen={isOpen} onClose={onClose} size='md'>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Ratings</ModalHeader>
+          <ModalHeader>Ratings: {totalRatings} total</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             {/* <Bar options={options} data={data} />; */}

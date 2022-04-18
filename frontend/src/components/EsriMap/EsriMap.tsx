@@ -10,7 +10,9 @@ import Expand from '@arcgis/core/widgets/Expand';
 import Home from '@arcgis/core/widgets/Home';
 import PictureMarkerSymbol from '@arcgis/core/symbols/PictureMarkerSymbol';
 import Graphic from '@arcgis/core/Graphic';
-import UniqueValueRenderer from "@arcgis/core/renderers/UniqueValueRenderer";
+import * as watchUtils from "@arcgis/core/core/watchUtils";
+import UniqueValueRenderer from '@arcgis/core/renderers/UniqueValueRenderer';
+
 import { SmallCardContainer } from '../CardWithImage/CardWithImage';
 
 interface EsriMapProps { }
@@ -47,11 +49,13 @@ const EsriMap: FC<EsriMapProps> = () => {
       webmap.when(() => {
         const exhibitLayer = view.map.allLayers.find(lyr => lyr.title === 'Exhibits') as unknown as FeatureLayer;
         const facilityLayer = view.map.allLayers.find(lyr => lyr.title === 'Facilities') as unknown as FeatureLayer;
+        const facilityCopyLayer = view.map.allLayers.find(lyr => lyr.title === 'Facilities-Copy') as unknown as FeatureLayer;
+        
         facilitySymbology(facilityLayer);
 
         // create widgets
         setHomeWidget(view);
-        setLayerWidget(view);
+        setLayerWidget(view, facilityLayer, facilityCopyLayer);
         setLegendWidget(view);
         setSearchWidget(view, exhibitLayer, setItems);
 
@@ -61,10 +65,7 @@ const EsriMap: FC<EsriMapProps> = () => {
           // as screen locations as they expose an x,y coordinate that conforms
           // to the ScreenPoint definition.
           view.hitTest(event).then(async (response) => {
-            console.log('response', response);
-            for (let r of response.results) {
-              console.log(r.graphic.layer.title);
-            }
+            // console.log('response', response);
             const exhibit = response.results?.find(e => e.graphic.layer.title === 'Exhibits');
             if (exhibit) {
               __createHighlightGraphic(view, exhibit.graphic.geometry);
@@ -76,7 +77,7 @@ const EsriMap: FC<EsriMapProps> = () => {
 
               const animals = await __getAnimals(exhibit, exhibitLayer);
               setItems(animals);
-              console.log('animals', animals);
+              // console.log('animals', animals);
             }
           });
         });
@@ -100,7 +101,7 @@ function facilitySymbology(layer: FeatureLayer) {
   const bathroomSymbol = __createPictureSymbol('https://raw.githubusercontent.com/Esri/calcite-point-symbols/master/icons/toilet-21.svg', symbolSize);
   const foodSymbol = __createPictureSymbol('https://raw.githubusercontent.com/Esri/calcite-point-symbols/master/icons/hamburger-21.svg', symbolSize);
   const infoSymbol = __createPictureSymbol('https://raw.githubusercontent.com/Esri/calcite-point-symbols/master/icons/information-17.svg', symbolSize);
-  
+
   const renderer = new UniqueValueRenderer({
     field: 'type',
     // defaultSymbol: { type: 'simple-fill' },  // autocasts as new SimpleFillSymbol()
@@ -148,10 +149,11 @@ function setLegendWidget(view: MapView) {
 
   view.ui.add(legendExpand, 'top-left');
 }
-function setLayerWidget(view: MapView) {
+function setLayerWidget(view: MapView, layer: FeatureLayer, layerCopy: FeatureLayer) {
   // LayerList
+  const layerDiv = document.createElement('div') as any;
   const layerList = new LayerList({
-    container: document.createElement('div'),
+    container: layerDiv,
     view: view,
     listItemCreatedFunction: (event) => {
 
@@ -159,7 +161,7 @@ function setLayerWidget(view: MapView) {
       // layer in the LayerList widget.
 
       const item: __esri.ListItem = event.item;
-      console.log('item.title', item.title);
+      // console.log('item.title', item.title);
       const show = ['Exhibits', 'Facilities', 'Buildings', 'Region']
       if (!show.includes(item.title)) {
         item.layer.listMode = 'hide';
@@ -173,6 +175,10 @@ function setLayerWidget(view: MapView) {
     content: layerList
   });
   view.ui.add(layerListExpand, 'top-left');
+
+  console.log('listening....')
+  watchUtils.watch(layer, 'visible', e => layerCopy.visible = e);
+  
 }
 function setSearchWidget(view: MapView, exhibitLayer: FeatureLayer, setItems: React.Dispatch<any>) {
   // typical usage
@@ -247,7 +253,7 @@ function __createPictureSymbol(url: string, size: number): PictureMarkerSymbol {
 }
 
 async function __getAnimals(exhibit: any, exhibitLayer: FeatureLayer) {
-  console.log('exhibit', exhibit);
+  // console.log('exhibit', exhibit);
 
   let layer: any, objId: any;
   if (exhibit.graphic) {
@@ -259,14 +265,14 @@ async function __getAnimals(exhibit: any, exhibitLayer: FeatureLayer) {
   }
   // const layer = exhibit.graphic.layer as unknown as any;
   const relId: number = layer.relationships[0].id;
-  console.log('relId', relId);
+  // console.log('relId', relId);
   const query = {
     outFields: ['*'],
     relationshipId: relId,
     objectIds: [objId]
   }
   const queryResult = await exhibitLayer.queryRelatedFeatures(query);
-  console.log('queryResult', queryResult);
+  // console.log('queryResult', queryResult);
   const animalsRaw = queryResult[objId].features;
   const animals = animalsRaw.map((e: any) => e.attributes);
   return animals;
