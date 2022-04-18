@@ -7,6 +7,8 @@ import styles from './FiveStar.module.css';
 
 interface FiveStarProps {
   animalName: string;
+  setRated: React.Dispatch<React.SetStateAction<number>>;
+  rated: number;
 }
 
 async function createRating(rating: number, name: string) {
@@ -39,12 +41,12 @@ async function getRating(name: string) {
   return json
 }
 
-const FiveStar: FC<FiveStarProps> = ({ animalName }) => {
+const FiveStar: FC<FiveStarProps> = ({ animalName, setRated, rated }) => {
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(0);
-  const [rated, setRated] = useState(-1);
+  // const [rated, setRated] = useState(-1);
   const [totalRatings, setTotalRatings] = useState(-1);
-  const [showMessage, setShowMessge] = useState(false);
+  const [showMessage, setShowMessage] = useState(false);
   const [currentAvg, setCurrentAvg] = useState(-1);
   const [allRatings, setAllRatings] = useState(null as any);
   useEffect(() => {
@@ -74,11 +76,11 @@ const FiveStar: FC<FiveStarProps> = ({ animalName }) => {
               >
                 <Icon
                   as={AiFillStar}
-                  color={index <= (hover || rating) ? "yellow.400" : "grey"}
+                  color={index <= (hover || rating || rated) ? "yellow.400" : "grey"}
                   w={8} h={8}
                   onClick={async () => {
                     if (rated === -1) {
-                      setShowMessge(true);
+                      setShowMessage(true);
                       await createRating(index, animalName)
                       setRated(index);
                       setRating(index);
@@ -91,7 +93,7 @@ const FiveStar: FC<FiveStarProps> = ({ animalName }) => {
           })}
         </HStack>
         {/* {showMessage && */}
-        <Fade in={showMessage}>
+        <Fade in={rated !== -1}>
           <Box>
             <HStack>
               <Text color='green.500'>

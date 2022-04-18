@@ -52,8 +52,9 @@ interface SmallCardContainerProps {
 
 const cardWidth = { sm: '20em', md: '10em', lg: '15em' }
 
-const CardAccordion: FC<any> = ({ name, license_link, exhibitId, img, conservation, img_credit, scientificName, wiki }) => {
+const CardAccordion: FC<any> = ({ name, license_link, exhibitId, img, conservation, img_credit, scientificName, wiki}) => {
   const [isActive, setIsActive] = useState(false);
+  const [rated, setRated] = useState(-1);
   return (
     <Box>
       {isActive
@@ -66,7 +67,9 @@ const CardAccordion: FC<any> = ({ name, license_link, exhibitId, img, conservati
           scientificName={scientificName}
           wiki={wiki}
           setIsActive={setIsActive}
-          license_link={license_link} />
+          license_link={license_link}
+          rated={rated}
+          setRated={setRated} />
         : <div style={{ cursor: 'pointer' }} onClick={() => setIsActive(true)}>
           <SmallCard name={name}
             exhibitId={exhibitId}
@@ -83,37 +86,39 @@ const CardAccordion: FC<any> = ({ name, license_link, exhibitId, img, conservati
 
 // type SmallCardContainerProps = SmallCardProps[];
 // interface SmallCardContainerProps extends Array<SmallCardContainerProps>{};
-const SmallCardContainer: FC<any> = ({ items }) => (
-  <Center py={1}>
-    <Box w='100%' rounded={'md'} py={3} my={2} mx={3}>
-      <VStack>
-        <Center>
-          <Heading
-            fontWeight={500}
-            bg={useColorModeValue('green.50', 'green.900')}
-            p={2}
-            px={3}
-            color={'green.500'}
-            rounded={'full'}>
-            Animals
-          </Heading>
-        </Center>
-        {items.map((item: any) => (
-          <CardAccordion
-            key={item.name}
-            name={item.name}
-            exhibitId={item.exhibitId}
-            img={item.img}
-            conservation={item.conservation}
-            img_credit={item.img_credit}
-            scientificName={item.scientificName}
-            wiki={item.wiki}
-            license_link={item.license_link} />
-        ))}
-      </VStack>
-    </Box>
-  </Center>
-);
+const SmallCardContainer: FC<any> = ({ items }) => {
+  return (
+    <Center py={1}>
+      <Box w='100%' rounded={'md'} py={3} my={2} mx={3}>
+        <VStack>
+          <Center>
+            <Heading
+              fontWeight={500}
+              bg={useColorModeValue('green.50', 'green.900')}
+              p={2}
+              px={3}
+              color={'green.500'}
+              rounded={'full'}>
+              Animals
+            </Heading>
+          </Center>
+          {items.map((item: any) => (
+            <CardAccordion
+              key={item.name}
+              name={item.name}
+              exhibitId={item.exhibitId}
+              img={item.img}
+              conservation={item.conservation}
+              img_credit={item.img_credit}
+              scientificName={item.scientificName}
+              wiki={item.wiki}
+              license_link={item.license_link} />
+          ))}
+        </VStack>
+      </Box>
+    </Center>
+  )
+};
 const SmallCard: FC<SmallCardProps> = ({ name, img }) => (
   <Center py={1}>
     <Box
@@ -170,7 +175,7 @@ const ConservationIndicator: FC<ConservationInterface> = ({ val, conservation, c
   </Center>
 );
 
-const CardWithImage: FC<any> = ({ img, setIsActive, conservation, name, scientificName, wiki, img_credit, license_link }) => (
+const CardWithImage: FC<any> = ({ img, setIsActive, conservation, name, scientificName, wiki, img_credit, license_link, rated, setRated }) => (
   <div className='cardWithImage'>
     <Center py={3}>
       <Box
@@ -286,17 +291,17 @@ const CardWithImage: FC<any> = ({ img, setIsActive, conservation, name, scientif
             </Box>
           }
           {wiki &&
-          <Link href={wiki} isExternal>
-            <Button>
-              Read More <Icon ml={3} as={FiExternalLink}></Icon>
-            </Button>
-          </Link>
+            <Link href={wiki} isExternal>
+              <Button>
+                Read More <Icon ml={3} as={FiExternalLink}></Icon>
+              </Button>
+            </Link>
           }
         </Stack>
         <Stack mt={6} direction={'row'} spacing={4} align={'center'}>
           <Stack direction={'column'} spacing={2} fontSize={'md'}>
             <Text fontWeight={600}>Rate this exhibit!</Text>
-            <FiveStar animalName={name} />
+            <FiveStar rated={rated} setRated={setRated} animalName={name} />
           </Stack>
         </Stack>
       </Box>
