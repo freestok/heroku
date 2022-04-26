@@ -14,15 +14,16 @@ import * as watchUtils from "@arcgis/core/core/watchUtils";
 import UniqueValueRenderer from '@arcgis/core/renderers/UniqueValueRenderer';
 
 import { SmallCardContainer } from '../CardWithImage/CardWithImage';
+import { Box, Flex, HStack, Spacer, useMediaQuery } from '@chakra-ui/react';
 
 interface EsriMapProps { }
 
-// const searchGraphics = new GraphicsLayer();
-// const clickGraphics = new GraphicsLayer();
 
 const EsriMap: FC<EsriMapProps> = () => {
+  const [mediaQuery] = useMediaQuery('(min-width: 30em)')
   const mapDiv = useRef(null);
   const [items, setItems] = useState([] as unknown as any);
+  const [view, setView] = useState(null as any);
   useEffect(() => {
     if (mapDiv.current) {
       /**
@@ -38,19 +39,16 @@ const EsriMap: FC<EsriMapProps> = () => {
         container: mapDiv.current,
         map: webmap
       });
-
-      // webmap.addMany([searchGraphics, clickGraphics]);
-
-      // webmap.reorder(searchGraphics, webmap.allLayers.length);
-      // webmap.reorder(clickGraphics, webmap.allLayers.length);
-
+      setView(view);
+      console.log('view.padding.right', view.padding.right);
+      mediaQuery ? view.padding.right = 300 : view.padding.right = 0;
 
       // bonus - how many bookmarks in the webmap?
       webmap.when(() => {
         const exhibitLayer = view.map.allLayers.find(lyr => lyr.title === 'Exhibits') as unknown as FeatureLayer;
         const facilityLayer = view.map.allLayers.find(lyr => lyr.title === 'Facilities') as unknown as FeatureLayer;
         const facilityCopyLayer = view.map.allLayers.find(lyr => lyr.title === 'Facilities-Copy') as unknown as FeatureLayer;
-        
+
         facilitySymbology(facilityLayer);
 
         // create widgets
@@ -85,18 +83,66 @@ const EsriMap: FC<EsriMapProps> = () => {
     }
   }, []);
 
+  // useEffect(() => {
+  //   console.log('mediaQuery!')
+  //   if (view) {
+  //     mediaQuery ? view.padding.right = 300 : view.padding.right = 0;
+  //   }
+  // }, [mediaQuery]);
+
   return (
     <div className={styles.EsriMap}>
-      <div className={styles.mapDiv} ref={mapDiv}></div>
-      <div className={styles.sidebar}>
-        <SmallCardContainer items={items} />
-      </div>
+      <Flex
+        flex={1}
+        position={'relative'}
+        direction={mediaQuery ? undefined : 'column'}
+        w={'full'}
+        h='full'>
+        <Box
+          w={'100%'}
+          h={'100%'}
+          position={'absolute'}
+          zIndex={1}
+        >
+          <div className={styles.mapDiv} ref={mapDiv}></div>
+        </Box>
+
+        <Spacer />
+        {items.length &&
+          <Box
+            position={'relative'}
+            rounded={'2xl'}
+            bg='whiteAlpha.900'
+            my={mediaQuery ? 4 : 1}
+            // mr={mediaQuery ? 5 : 3}
+            mx={mediaQuery ? 4 : 2}
+            // mb={10}
+            boxShadow={'2xl'}
+            zIndex={2}
+            // width={'full'}
+            maxH={mediaQuery ? 'full' : '50%'}
+            overflow={'auto'}
+            sx={{
+              '&::-webkit-scrollbar': {
+                width: '16px',
+                borderRadius: '8px',
+                backgroundColor: `rgba(0, 0, 0, 0.05)`,
+              },
+              '&::-webkit-scrollbar-thumb': {
+                backgroundColor: `rgba(75, 150, 109, 0.5)`,
+              },
+            }}>
+            <SmallCardContainer setItems={setItems} items={items} />
+          </Box>
+        }
+
+      </Flex>
     </div>
   )
 };
 
 function facilitySymbology(layer: FeatureLayer) {
-  const symbolSize = 25;
+  const symbolSize = 15;
   const babySymbol = __createPictureSymbol('https://raw.githubusercontent.com/Esri/calcite-point-symbols/master/icons/baby-21.svg', symbolSize);
   const bathroomSymbol = __createPictureSymbol('https://raw.githubusercontent.com/Esri/calcite-point-symbols/master/icons/toilet-21.svg', symbolSize);
   const foodSymbol = __createPictureSymbol('https://raw.githubusercontent.com/Esri/calcite-point-symbols/master/icons/hamburger-21.svg', symbolSize);
@@ -178,7 +224,7 @@ function setLayerWidget(view: MapView, layer: FeatureLayer, layerCopy: FeatureLa
 
   console.log('listening....')
   watchUtils.watch(layer, 'visible', e => layerCopy.visible = e);
-  
+
 }
 function setSearchWidget(view: MapView, exhibitLayer: FeatureLayer, setItems: React.Dispatch<any>) {
   // typical usage

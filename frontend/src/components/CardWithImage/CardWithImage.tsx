@@ -86,12 +86,14 @@ const CardAccordion: FC<any> = ({ name, license_link, exhibitId, img, conservati
 
 // type SmallCardContainerProps = SmallCardProps[];
 // interface SmallCardContainerProps extends Array<SmallCardContainerProps>{};
-const SmallCardContainer: FC<any> = ({ items }) => {
+const SmallCardContainer: FC<any> = ({ items, setItems }) => {
   return (
     <Center py={1}>
       <Box w='100%' rounded={'md'} py={3} my={2} mx={3}>
         <VStack>
           <Center>
+            <HStack>
+
             <Heading
               fontWeight={500}
               bg={useColorModeValue('green.50', 'green.900')}
@@ -101,6 +103,23 @@ const SmallCardContainer: FC<any> = ({ items }) => {
               rounded={'full'}>
               Animals
             </Heading>
+            <Button
+              // rounded='2xl'
+              borderRadius={'50%'}
+              w={10}
+              h={10}
+              m={2}
+              bg='whiteAlpha.300'
+              onClick={() => setItems([])}
+            >
+              <Center>
+                <Icon
+                  as={FiXCircle}
+                  fontSize="24"
+                />
+              </Center>
+            </Button>
+            </HStack>
           </Center>
           {items.map((item: any) => (
             <CardAccordion
@@ -123,6 +142,8 @@ const SmallCard: FC<SmallCardProps> = ({ name, img }) => (
   <Center py={1}>
     <Box
       w={cardWidth}
+      maxW={cardWidth}
+      // minW={'100%'}
       bg={useColorModeValue('white', 'gray.900')}
       boxShadow={'lg'}
       rounded={'md'}

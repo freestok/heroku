@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { FC, ReactNode } from 'react';
 import {
   Box,
   Flex,
@@ -25,7 +25,8 @@ import {
   ModalOverlay,
   ListItem,
   UnorderedList,
-  Text
+  Text,
+  useMediaQuery 
 } from '@chakra-ui/react';
 import { AiFillGithub } from 'react-icons/ai';
 // import { HamburgerIcon, CloseIcon, AddIcon } from '@chakra-ui/icons';
@@ -47,8 +48,9 @@ const NavLink = ({ children }: { children: ReactNode }) => (
 );
 
 export default function NavBar() {
-  const { isOpen, onOpen, onClose } = useDisclosure();
-
+  let { isOpen, onOpen, onClose } = useDisclosure({defaultIsOpen: true});
+  // isOpen = true;
+  
   return (
     <>
       <Box bg={useColorModeValue('gray.100', 'gray.900')} px={4}>
@@ -92,7 +94,7 @@ export default function NavBar() {
                           <ListItem>Click on an exhibit to see animal information</ListItem>
                           <ListItem>Toggle layers on and off</ListItem>
                           <ListItem>Rate exhibits on a five-star scale</ListItem>
-                          <ListItem>View the breakdown of every animals ratings</ListItem>
+                          <ListItem>View the breakdown of every animal's ratings</ListItem>
                         </UnorderedList>
                       </Box>
                     }
