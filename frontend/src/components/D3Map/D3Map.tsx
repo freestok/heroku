@@ -268,7 +268,7 @@ const D3Map: FC<D3MapProps> = (props: D3MapProps) => {
           style={{
             height: "50%",
             marginRight: "0px",
-            marginLeft: "0px",
+            marginLeft: "0",
             marginTop: "0em",
             vectorEffect: "non-scaling-stroke"
           }} />

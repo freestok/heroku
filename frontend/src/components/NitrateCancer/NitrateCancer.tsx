@@ -28,7 +28,17 @@ import {
   RadioGroup,
   VStack,
   Spinner,
-  HStack
+  HStack,
+  Center,
+  ListItem,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  UnorderedList
 } from '@chakra-ui/react';
 
 import { Textarea } from '@chakra-ui/react';
@@ -134,10 +144,12 @@ const NitrateCancer: FC<any> = ({ children }: { children: ReactNode }) => {
       </Drawer>
       {/* mobilenav */}
       <MobileNav display={{ base: 'flex', md: 'none' }} onOpen={onOpen} />
+      {/* <Center> */}
       <Box ml={{ base: 0, md: 60 }} p="4">
         {children}
         <D3Map passD3Data={setChildD3Data} complete={complete} data={files} />
       </Box>
+      {/* </Center> */}
     </Box>
   );
 }
@@ -159,7 +171,7 @@ const SidebarContent = ({ onClose, d3Data, files, setFiles, complete, setComplet
   // const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  
+
   const handleSubmit = async (event: any) => {
     // console.log(d3Data);
     setLoading(true);
@@ -208,20 +220,57 @@ const SidebarContent = ({ onClose, d3Data, files, setFiles, complete, setComplet
 
     // files['analysisResults'] = json;
   }
-
+  // const { isOpen, onOpen, onClose } = 
+  const disclosure = useDisclosure({ defaultIsOpen: true });
+  // disclosure.
   return (
     <Box
       bg={useColorModeValue('white', 'gray.900')}
       borderRight="1px"
       borderRightColor={useColorModeValue('gray.200', 'gray.700')}
-      w={{ base: 'full', md: 60 }}
+      w={{ base: 'full', md: 300 }}
       pos="fixed"
       h="full"
       {...rest}>
       <Flex h="20" alignItems="center" marginBottom={3} mx="8" justifyContent="space-between">
-        <Text fontSize="2xl" fontFamily="monospace" fontWeight="bold">
-          Correlation Finder
-        </Text>
+        <HStack>
+          <Text fontSize="2xl" fontFamily="monospace" fontWeight="bold">
+            Correlation Finder
+          </Text>
+          <Button boxShadow={'sm'} bg='purple.100' onClick={disclosure.onOpen}>Help</Button>
+        </HStack>
+
+        <Modal isOpen={disclosure.isOpen} onClose={disclosure.onClose} size='md'>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Help</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              {/* <Bar options={options} data={data} />; */}
+              {disclosure.isOpen &&
+                <Box>
+                  <VStack spacing={5}>
+                    <Text>
+                      Welcome to the Correlation Finder. This tool will try to find the correlation between nitrate levels in wells and the cancer rates in census tracts. Enter your K-value and nearest neighbors amount to get started.
+                    </Text>
+                    <Text>
+                      First, the wells are converted into a continuous surface through IDW interpolation. The average value of that continuous surface is mapped onto each census tract. With a 1:1 comparison of cancer rates and nitrate levels, the program finds how strongly the two are correlated.
+                    </Text>
+                    <Text>
+                      Play around with the K-value (or "power value") and amount of nearest neighbors to change how the IDW interpolation is calculated. After submitting, the results will show up at the bottom of the screen, and the resulting statistics will be available on the side of the screen.
+                    </Text>
+                  </VStack>
+                </Box>
+              }
+            </ModalBody>
+
+            <ModalFooter>
+              <Button colorScheme='blue' mr={3} onClick={disclosure.onClose}>
+                Close
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
         <CloseButton display={{ base: 'flex', md: 'none' }} onClick={onClose} />
       </Flex>
       <Box p={2} ml={3} mr={3} borderWidth={1} borderRadius={8} boxShadow="lg">
