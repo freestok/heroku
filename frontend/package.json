@@ -16,6 +16,7 @@
     "@types/react-dom": "^17.0.11",
     "@types/topojson": "^3.2.3",
     "chroma-js": "^2.4.2",
+    "create-react-app": "^5.0.1",
     "d3": "^7.3.0",
     "d3-svg-legend": "^2.25.6",
     "framer-motion": "^6.2.8",
@@ -24,6 +25,7 @@
     "react-icons": "^4.3.1",
     "react-router-dom": "^6.2.1",
     "react-scripts": "5.0.0",
+    "react-scrollama": "^2.3.0",
     "topojson-client": "^3.1.0",
     "topojson-server": "^3.0.1",
     "typescript": "^4.5.5",
@@ -35,7 +37,8 @@
     "server": "cd ./../api && \"C:\\Users\\admin\\miniconda3\\envs\\flask-heroku\\Scripts\\flask.exe\" run --no-debugger",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "component": "npx generate-react-cli component ScrollyMap"
   },
   "eslintConfig": {
     "extends": [
