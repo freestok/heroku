@@ -4,10 +4,16 @@ import { Scrollama, Step } from 'react-scrollama';
 import { Flex, Spacer, Button, Center, Icon, Box, Image, Text, Stack, HStack, Link, Heading, Divider } from '@chakra-ui/react';
 import { FiXCircle } from 'react-icons/fi';
 
+function iframe(file: String) {
+  return {
+    __html: `<iframe src="${file}" width="600" height="600"></iframe>`
+  }
+}
+
 interface ScrollyMapProps { }
 const cardWidth = { sm: '20em', md: '10em', lg: '15em' }
 
-const StatCard: FC<any> = ({ chartUrl, mapUrl, text }) => (
+const StatCard: FC<any> = ({ chartUrl, mapUrl, text, chartHtml }) => (
   <Center py={1}>
     <Box
       w={'full'}
@@ -45,11 +51,17 @@ const StatCard: FC<any> = ({ chartUrl, mapUrl, text }) => (
           </Heading>
         </Center>
         <Center>
-          <HStack>
-            <Image
+          <HStack >
+            {/* <Image
               // boxSize='200px' 
-              src={chartUrl}/>
-              <Spacer />
+              src={chartUrl} /> */}
+            <Box 
+              overflow={'hidden'}
+              // maxHeight={50}
+            >
+              <div dangerouslySetInnerHTML={iframe(chartHtml)}></div>
+            </Box>
+            {/* <Spacer /> */}
             <Image
               boxSize='400px'
               src={mapUrl}
@@ -99,10 +111,10 @@ const ScrollyMap: FC<ScrollyMapProps> = () => {
       <Divider my={5} />
 
       {/* all OG images here https://imgur.com/a/zVxfJOu */}
-      <StatCard chartUrl='https://i.imgur.com/5BWvG7b.png' mapUrl='https://i.imgur.com/Vkujw7t.png' text='asthma rates' />
-      <StatCard chartUrl='https://i.imgur.com/KjcvF56.png' mapUrl='https://i.imgur.com/tXtFOJk.png' text='temperatures' />
-      <StatCard chartUrl='https://i.imgur.com/KwXOl9z.png' mapUrl='https://i.imgur.com/XaWjEng.png' text='physical health challenges' />
-      <StatCard chartUrl='https://i.imgur.com/s5PXSld.png' mapUrl='https://i.imgur.com/8ImEjBk.png' text='mental health challenges' />
+      <StatCard chartUrl='https://i.imgur.com/5BWvG7b.png' mapUrl='https://i.imgur.com/Vkujw7t.png' text='asthma rates' chartHtml='./asthma.html' />
+      <StatCard chartUrl='https://i.imgur.com/KjcvF56.png' mapUrl='https://i.imgur.com/tXtFOJk.png' text='temperatures' chartHtml='./temperature.html' />
+      <StatCard chartUrl='https://i.imgur.com/KwXOl9z.png' mapUrl='https://i.imgur.com/XaWjEng.png' text='physical health challenges' chartHtml='./phys_health.html' />
+      <StatCard chartUrl='https://i.imgur.com/s5PXSld.png' mapUrl='https://i.imgur.com/8ImEjBk.png' text='mental health challenges' chartHtml='./ment_health.html' />
     </div>
   )
 };
