@@ -111,10 +111,10 @@ const ScrollyMap: FC<ScrollyMapProps> = () => {
       <Divider my={5} />
 
       {/* all OG images here https://imgur.com/a/zVxfJOu */}
-      <StatCard chartUrl='https://i.imgur.com/5BWvG7b.png' mapUrl='https://i.imgur.com/Vkujw7t.png' text='asthma rates' chartHtml='./asthma.html' />
-      <StatCard chartUrl='https://i.imgur.com/KjcvF56.png' mapUrl='https://i.imgur.com/tXtFOJk.png' text='temperatures' chartHtml='./temperature.html' />
-      <StatCard chartUrl='https://i.imgur.com/KwXOl9z.png' mapUrl='https://i.imgur.com/XaWjEng.png' text='physical health challenges' chartHtml='./phys_health.html' />
-      <StatCard chartUrl='https://i.imgur.com/s5PXSld.png' mapUrl='https://i.imgur.com/8ImEjBk.png' text='mental health challenges' chartHtml='./ment_health.html' />
+      <StatCard chartUrl='https://i.imgur.com/5BWvG7b.png' mapUrl='https://i.imgur.com/Vkujw7t.png' text='asthma rates' chartHtml='https://freestok.herokuapp.com/asthma.html' />
+      <StatCard chartUrl='https://i.imgur.com/KjcvF56.png' mapUrl='https://i.imgur.com/tXtFOJk.png' text='temperatures' chartHtml='https://freestok.herokuapp.com/temperature.html' />
+      <StatCard chartUrl='https://i.imgur.com/KwXOl9z.png' mapUrl='https://i.imgur.com/XaWjEng.png' text='physical health challenges' chartHtml='https://freestok.herokuapp.com/phys_health.html' />
+      <StatCard chartUrl='https://i.imgur.com/s5PXSld.png' mapUrl='https://i.imgur.com/8ImEjBk.png' text='mental health challenges' chartHtml='https://freestok.herokuapp.com/ment_health.html' />
     </div>
   )
 };
